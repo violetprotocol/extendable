@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.4;
 
-import "../Logic.sol";
+import "../Extension.sol";
 import "./IPermissioningLogic.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 

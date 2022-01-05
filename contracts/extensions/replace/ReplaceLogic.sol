@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
-import "../Logic.sol";
+import "../Extension.sol";
 import "./IReplaceLogic.sol";
 import "../extend/IExtendLogic.sol";
 import "../retract/IRetractLogic.sol";

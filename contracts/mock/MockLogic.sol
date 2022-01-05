@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.4;
 
-import "../extensions/Logic.sol";
+import "../extensions/Extension.sol";
 
 interface IMockLogic {event Test();function test() external;function reverts() external;}
 contract MockLogic is IMockLogic, Extension {

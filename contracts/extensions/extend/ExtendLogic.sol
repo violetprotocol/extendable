@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
-import "../Logic.sol";
+import "../Extension.sol";
 import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
