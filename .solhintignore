@@ -1,0 +1,6 @@
+# directories
+**/artifacts
+**/node_modules
+
+# Files
+contracts/extendable/Extendable.sol
