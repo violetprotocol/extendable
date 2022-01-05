@@ -11,7 +11,7 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 // Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
 // Only allows replacement of extensions that share the exact same interface
-contract StrictReplaceLogic is IReplaceLogic, Logic {
+contract StrictReplaceLogic is IReplaceLogic, Extension {
     constructor() {
         _registerInterface(getInterfaceId());
     }

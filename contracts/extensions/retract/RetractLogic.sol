@@ -7,7 +7,7 @@ import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-contract RetractLogic is IRetractLogic, Logic {
+contract RetractLogic is IRetractLogic, Extension {
     constructor() {
         _registerInterface(getInterfaceId());
     }

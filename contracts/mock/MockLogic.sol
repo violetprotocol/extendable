@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "../extensions/Logic.sol";
 
 interface IMockLogic {event Test();function test() external;function reverts() external;}
-contract MockLogic is IMockLogic, Logic {
+contract MockLogic is IMockLogic, Extension {
     function test() override public {
         emit Test();
     }
@@ -23,7 +23,7 @@ contract MockLogic is IMockLogic, Logic {
 }
 
 interface IMockLogic2 {event Test();function second() external;}
-contract MockLogic2 is IMockLogic2, Logic {
+contract MockLogic2 is IMockLogic2, Extension {
     function second() override public {
         emit Test();
     }

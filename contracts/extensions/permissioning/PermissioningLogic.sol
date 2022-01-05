@@ -5,7 +5,7 @@ import "../Logic.sol";
 import "./IPermissioningLogic.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-contract PermissioningLogic is IPermissioningLogic, Logic {
+contract PermissioningLogic is IPermissioningLogic, Extension {
     function init() override public {
         RoleState storage state = Permissions._getStorage();
         require(state.owner == address(0x0), "already initialised"); // make sure owner has yet to be set for delegator

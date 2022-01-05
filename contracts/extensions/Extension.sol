@@ -5,7 +5,7 @@ import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 
-abstract contract Logic is ERC165Storage, IExtension {
+abstract contract Extension is ERC165Storage, IExtension {
     function _fallback() internal virtual {
         revert ExtensionNotImplemented();
     }

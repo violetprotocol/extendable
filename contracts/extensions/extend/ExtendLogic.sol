@@ -7,7 +7,7 @@ import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-contract ExtendLogic is IExtendLogic, Logic {
+contract ExtendLogic is IExtendLogic, Extension {
     constructor() {
         _registerInterface(getInterfaceId());
     }

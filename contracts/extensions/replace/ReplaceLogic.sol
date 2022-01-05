@@ -10,7 +10,7 @@ import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorag
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 // Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
-contract ReplaceLogic is IReplaceLogic, Logic {
+contract ReplaceLogic is IReplaceLogic, Extension {
     constructor() {
         _registerInterface(getInterfaceId());
     }
