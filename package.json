@@ -1,0 +1,44 @@
+{
+  "name": "extendable",
+  "version": "1.0.0",
+  "description": "Extendable smart contract pattern",
+  "main": "index.js",
+  "scripts": {
+    "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"./test/**/*.js\"",
+    "lint:sol": "solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
+    "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
+    "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts}\"",
+    "test": "hardhat test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/violetprotocol/extendable.git"
+  },
+  "author": "papasmurf",
+  "license": "LGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/violetprotocol/extendable/issues"
+  },
+  "homepage": "https://github.com/violetprotocol/extendable#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@nomiclabs/hardhat-web3": "^2.0.0",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.4",
+    "hardhat": "^2.6.0",
+    "hardhat-gas-reporter": "^1.0.6",
+    "prettier": "^2.5.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "solhint": "^3.3.6",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "^0.7.17",
+    "web3": "^1.5.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.0",
+    "@tenderly/hardhat-tenderly": "^1.0.13"
+  }
+}
