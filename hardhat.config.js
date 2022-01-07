@@ -20,13 +20,13 @@ module.exports = {
       url: "http://127.0.0.1:8545",
     },
     rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/UuiPY5yrnxf3Yi3aUrejN16cL9PH4byw",
+      url: `${process.env.NODE_URL}`,
       accounts: [`0x${process.env.RINKEBY_PRIVATE_KEY}`],
     },
   },
   tenderly: {
-    username: "papasmurf",
-    project: "project",
+    username: `${process.env.TENDERLY_USERNAME}`,
+    project: `${process.env.TENDERLY_PROJECT_NAME}`,
   },
   gasReporter: {
     currency: "USD",

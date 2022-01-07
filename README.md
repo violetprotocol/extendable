@@ -18,7 +18,7 @@ _Extendable_ contracts have an evolving interface which is accessible through th
 
 ### Extensions
 
-_Extension_ logic contracts implement functional logic that is called by the _Extendable_ contract. Following extension principles of modularity and updateability, it is recommended to separate logic contracts into the most divisible units possible: single function contracts. Where logic contracts encompass more than a single function for dependency or cohesive reasons, it can envelope more functions but with the trade-off of being less modular; any upgrades to a single function requre the entire logic extension to be updated and re-registered.
+_Extension_ logic contracts implement functional logic that is called by the _Extendable_ contract. Following extension principles of modularity and updateability, it is recommended to separate logic contracts into the most divisible units possible: single function contracts. Where logic contracts encompass more than a single function for dependency or cohesive reasons, it can envelope more functions but with the trade-off of being less modular; any upgrades to a single function require the entire logic extension to be updated and re-registered.
 
 _Extension_ logic contracts can mutate state by accessing the storage of the delegator through custom storage slot access. Various different _Extension_ logic contracts can access the same state but extensions should be written and extended mindfully to avoid incorrect state mutability.
 

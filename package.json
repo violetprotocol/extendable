@@ -1,7 +1,7 @@
 {
-  "name": "core-contracts",
+  "name": "extendable",
   "version": "1.0.0",
-  "description": "Violet Protocol Core Contracts",
+  "description": "Extendable smart contract pattern",
   "main": "index.js",
   "scripts": {
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"./test/**/*.js\"",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/violetprotocol/core-contracts.git"
+    "url": "git+https://github.com/violetprotocol/extendable.git"
   },
   "author": "papasmurf",
   "license": "LGPL-3.0",
   "bugs": {
-    "url": "https://github.com/violetprotocol/core-contracts/issues"
+    "url": "https://github.com/violetprotocol/extendable/issues"
   },
-  "homepage": "https://github.com/violetprotocol/core-contracts#readme",
+  "homepage": "https://github.com/violetprotocol/extendable#readme",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
