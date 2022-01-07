@@ -30,6 +30,8 @@ contract AlterReplaceLogic is IReplaceLogic, Extension {
             // pass
         } catch (bytes memory err) { // if it fails, check if this is due to extend being removed
             if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
+                require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
+
                 IExtension old = IExtension(payable(oldExtension));
                 IExtension newEx = IExtension(payable(newExtension));
 

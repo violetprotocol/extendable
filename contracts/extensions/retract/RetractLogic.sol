@@ -30,7 +30,7 @@ contract RetractLogic is IRetractLogic, Extension {
             }
         }
 
-        revert("Retract: specified extension does not exist, cannot retract");
+        revert("Retract: specified extension is not an extension of this contract, cannot retract");
     }
 
     function getInterfaceId() override public pure returns(bytes4) {

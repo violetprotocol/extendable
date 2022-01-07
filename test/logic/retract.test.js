@@ -66,13 +66,13 @@ describe("RetractLogic", function () {
     });
 
     it("retract should fail with non-owner caller", async function () {
-        await expect(caller.connect(account2).callRetract(extendLogic.address)).to.be.reverted;
+        await expect(caller.connect(account2).callRetract(extendLogic.address)).to.be.revertedWith("unauthorised");
         expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address, replaceLogic.address]);
     });
 
     it("retract should fail with non-existent extension", async function () {
-        await expect(caller.callRetract(account.address)).to.be.reverted;
+        await expect(caller.callRetract(account.address)).to.be.revertedWith("Retract: specified extension is not an extension of this contract, cannot retract");
         expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address, replaceLogic.address]);
     });

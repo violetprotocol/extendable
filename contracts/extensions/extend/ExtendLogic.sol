@@ -15,7 +15,7 @@ contract ExtendLogic is IExtendLogic, Extension {
     function extend(address extension) override public virtual {
         Permissions._onlyOwner();
         
-        require(extension.code.length > 0, "ExtendLogic: address is not a contract");
+        require(extension.code.length > 0, "Extend: address is not a contract");
 
         ExtendableState storage state = ExtendableStorage._getStorage();
         IExtension ext = IExtension(payable(extension));

@@ -28,6 +28,8 @@ contract ReplaceLogic is IReplaceLogic, Extension {
         IExtension old = IExtension(payable(oldExtension));
         bool isReplacingExtend = old.getInterfaceId() == type(IExtendLogic).interfaceId;
         if (isReplacingExtend) {
+            require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
+
             // check if new extension implements the correct interface
             IExtension newEx = IExtension(payable(newExtension));
 

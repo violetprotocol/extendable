@@ -43,18 +43,18 @@ describe("ExtendLogic", function () {
     });
 
     it("extend should fail with non-contract address", async function () {
-        await expect(caller.callExtend(account.address)).to.be.reverted;
+        await expect(caller.callExtend(account.address)).to.be.revertedWith("Extend: address is not a contract");
         expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
     });
 
     it("extend should fail with non-owner caller", async function () {
-        await expect(caller.connect(account2).callExtend(extendLogic.address)).to.be.reverted;
+        await expect(caller.connect(account2).callExtend(extendLogic.address)).to.be.revertedWith("unauthorised");
         expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
     });
 
     it("extend should fail with same extension", async function () {
-        await expect(caller.callExtend(extendLogic.address)).to.be.revertedWith("");
+        await expect(caller.callExtend(extendLogic.address)).to.be.revertedWith("Extend: extension already exists for interfaceId");
     });
 });

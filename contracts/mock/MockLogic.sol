@@ -80,7 +80,7 @@ interface IMockNewExtendLogic {
     function randomNewFunction() external;
 }
 
-contract MockNewExtendLogic is IMockNewExtendLogic {
+contract MockNewExtendLogic is IMockNewExtendLogic, Extension {
     function extend(address extension) override public {}
 
     function getCurrentInterface() override public pure returns(string memory fullInterface) { return("lel"); }
@@ -90,6 +90,13 @@ contract MockNewExtendLogic is IMockNewExtendLogic {
     function getExtensionAddresses() override public pure returns(address[] memory) { return(new address[](0x0) ); }
 
     function randomNewFunction() override public {}
+
+    function getInterface() override public pure returns(string memory) {
+        return "function extend(address extension) external;function getCurrentInterface() external view returns(string memory fullInterface); function getExtensions() external view returns(bytes4[] memory); function getExtensionAddresses() external view returns(address[] memory); function randomNewFunction() external;";
+    }
+    function getInterfaceId() override public pure returns(bytes4) {
+        return type(IMockNewExtendLogic).interfaceId;
+    }
 }
 
 interface IMockNewReplaceLogic {
@@ -97,7 +104,13 @@ interface IMockNewReplaceLogic {
     function replaceWith(address oldExtension, address newExtension) external;
 }
 
-contract MockNewReplaceLogic is IMockNewReplaceLogic {
+contract MockNewReplaceLogic is IMockNewReplaceLogic, Extension {
     function replace(address oldExtension, address newExtension) override public {}
     function replaceWith(address oldExtension, address newExtension) override public {}
+    function getInterface() override public pure returns(string memory) {
+        return "function replace(address oldExtension, address newExtension) external; function replaceWith(address oldExtension, address newExtension) external;";
+    }
+    function getInterfaceId() override public pure returns(bytes4) {
+        return type(IMockNewReplaceLogic).interfaceId;
+    }
 }

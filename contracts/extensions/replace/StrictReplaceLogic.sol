@@ -18,6 +18,8 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
 
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
+        
+        require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
         IExtension old = IExtension(payable(oldExtension));
         IExtension newEx = IExtension(payable(newExtension));
