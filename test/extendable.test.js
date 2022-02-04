@@ -22,7 +22,7 @@ describe("Extendable", function () {
     let retractLogic;
     let newRetractLogic;
     let replaceLogic;
-    let alterReplaceLogic;
+    let stricReplaceLogic;
 
     before("deploy new", async function () {
         [account] = await ethers.getSigners();
@@ -31,7 +31,7 @@ describe("Extendable", function () {
         const PermissioningLogic = await ethers.getContractFactory("PermissioningLogic");
         const RetractLogic = await ethers.getContractFactory("RetractLogic");
         const ReplaceLogic = await ethers.getContractFactory("ReplaceLogic");
-        const AlterReplaceLogic = await ethers.getContractFactory("AlterReplaceLogic");
+        const StrictReplaceLogic = await ethers.getContractFactory("StrictReplaceLogic");
 
         const Extendable = await ethers.getContractFactory("Extendable");
 
@@ -41,14 +41,14 @@ describe("Extendable", function () {
         retractLogic = await RetractLogic.deploy();
         newRetractLogic = await RetractLogic.deploy();
         replaceLogic = await ReplaceLogic.deploy();
-        alterReplaceLogic = await AlterReplaceLogic.deploy();
+        strictReplaceLogic = await StrictReplaceLogic.deploy();
         await extendLogic.deployed();
         await newExtendLogic.deployed();
         await permissioningLogic.deployed();
         await retractLogic.deployed();
         await newRetractLogic.deployed();
         await replaceLogic.deployed();
-        await alterReplaceLogic.deployed();
+        await strictReplaceLogic.deployed();
 
         const extendable = await Extendable.deploy(extendLogic.address, permissioningLogic.address);
         await extendable.deployed();
@@ -224,15 +224,15 @@ describe("Extendable", function () {
             });
         });
 
-        describe("alternative replace", () => {
-            it("alternative replace with new extend logic should succeed", async function () {
+        describe("strict replace", () => {
+            it("strict replace with new extend logic should succeed", async function () {
                 const extendableRep = await utils.getExtendedContractWithInterface(extendableAddress, "ReplaceLogic");
-                await expect(extendableRep.replace(replaceLogic.address, alterReplaceLogic.address)).to.not.be.reverted;
+                await expect(extendableRep.replace(replaceLogic.address, strictReplaceLogic.address)).to.not.be.reverted;
                 await expect(extendableRep.replace(newExtendLogic.address, extendLogic.address)).to.not.be.reverted;
         
                 const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE]);
-                expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, alterReplaceLogic.address, extendLogic.address]);
+                expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, strictReplaceLogic.address, extendLogic.address]);
                 expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
                     "interface IExtended {",
                         "function retract(address extension) external;",
@@ -248,9 +248,9 @@ describe("Extendable", function () {
                 ));
             });
         
-            it("alternative replace with new replace logic should succeed", async function () {
+            it("strict replace with new replace logic should succeed", async function () {
                 const extendableRep = await utils.getExtendedContractWithInterface(extendableAddress, "ReplaceLogic");
-                await expect(extendableRep.replace(alterReplaceLogic.address, replaceLogic.address)).to.not.be.reverted;
+                await expect(extendableRep.replace(strictReplaceLogic.address, replaceLogic.address)).to.not.be.reverted;
         
                 const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
