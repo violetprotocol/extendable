@@ -15,7 +15,7 @@
     "url": "git+https://github.com/violetprotocol/extendable.git"
   },
   "author": "papasmurf",
-  "license": "LGPL-3.0",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/violetprotocol/extendable/issues"
   },
