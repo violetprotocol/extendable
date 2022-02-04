@@ -11,6 +11,7 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 // Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
 // Only allows replacement of extensions that share the exact same interface
+// Safest ReplaceLogic extension
 contract StrictReplaceLogic is IReplaceLogic, Extension {
     constructor() {
         _registerInterface(getInterfaceId());
@@ -18,7 +19,7 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
 
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
-        
+
         require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
         IExtension old = IExtension(payable(oldExtension));
@@ -35,6 +36,8 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
         // attempt to extend with new extension
         try extendLogic.extend(newExtension) {
             // pass
+        }  catch Error(string memory reason) {
+            revert(reason);
         } catch (bytes memory err) { // if it fails, check if this is due to extend being removed
             if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
                 // use raw delegate call to re-extend the extension because we have just removed the Extend function
