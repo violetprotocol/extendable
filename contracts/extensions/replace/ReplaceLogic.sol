@@ -14,10 +14,11 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 // for ExtendLogic where new extension must match interfaceId
 // Safer than ReplaceLogic
 contract ReplaceLogic is IReplaceLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
 
+    
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
 
@@ -60,6 +61,6 @@ contract ReplaceLogic is IReplaceLogic, Extension {
     }
 
     function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;";
+        return "function replace(address oldExtension, address newExtension) external;\n";
     }
 }

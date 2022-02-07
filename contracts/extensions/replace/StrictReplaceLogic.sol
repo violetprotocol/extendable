@@ -13,10 +13,11 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 // Only allows replacement of extensions that share the exact same interface
 // Safest ReplaceLogic extension
 contract StrictReplaceLogic is IReplaceLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
 
+    
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
 
@@ -57,6 +58,6 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
     }
 
     function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;";
+        return "function replace(address oldExtension, address newExtension) external;\n";
     }
 }

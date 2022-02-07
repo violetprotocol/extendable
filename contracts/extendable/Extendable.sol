@@ -1,25 +1,76 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "../errors/Errors.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../storage/PermissionStorage.sol";
 import "../extensions/permissioning/PermissioningLogic.sol";
 import "../extensions/extend/ExtendLogic.sol";
 
+/**
+ *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
+ * /\  ___\/\_\_\_\/\__  _\/\  ___\/\ "-.\ \/\  __-./\  __ \/\  == \/\ \    /\  ___\
+ * \ \  __\\/_/\_\/\/_/\ \/\ \  __\\ \ \-.  \ \ \/\ \ \  __ \ \  __<\ \ \___\ \  __\
+ *  \ \_____\/\_\/\_\ \ \_\ \ \_____\ \_\\"\_\ \____-\ \_\ \_\ \_____\ \_____\ \_____\
+ *   \/_____/\/_/\/_/  \/_/  \/_____/\/_/ \/_/\/____/ \/_/\/_/\/_____/\/_____/\/_____/
+ *
+ *  Core module for the Extendable framework
+ *  
+ *  Inherit this contract to make your contracts Extendable!
+ *
+ *  Your contract can perform ad-hoc addition or removal of functions
+ *  which allows modularity, re-use, upgrade, and extension of your
+ *  deployed contracts. You can make your contract immutable by removing
+ *  the ability for it to be extended.
+ *
+ *  Constructor initialises owner-based permissioning to manage
+ *  extending, where only the `owner` can extend the contract.
+ *  
+ *  You may change this constructor or use extension replacement to
+ *  use a different permissioning pattern for your contract.
+ *
+ *  Requirements:
+ *      - ExtendLogic contract must already be deployed
+ *      - PermissioningLogic contract must already be deployed
+ */
 contract Extendable {
-    constructor(address extendLogic, address permissionLogic) { // Feel free to customise the initialisations to use your own permissioning modules or none at all
+    /**
+     * @dev Contract constructor initialising the first extension `ExtendLogic`
+     *      to allow the contract to be extended.
+     *
+     * This implementation assumes that the `ExtendLogic` being used also uses
+     * an ownership pattern that only allows `owner` to extend the contract.
+     * 
+     * This constructor sets the owner of the contract and extends itself
+     * using the ExtendLogic extension.
+     *
+     * To change owner or ownership mode, your contract must be extended with the
+     * PermissioningLogic extension, giving it access to permissioning management.
+     */
+    constructor(address extendLogic, address permissionLogic) {
         (bool permSuccess, ) = permissionLogic.delegatecall(abi.encodeWithSignature("init()"));
         (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
         require(permSuccess, "failed to initialise permissioning");
         require(extendSuccess, "failed to initialise extension");
     }
     
-    function _delegate(address implementation) internal virtual returns(bool) {
+    /**
+     * @dev Delegates function calls to the specified `delegatee`.
+     *
+     * Performs a delegatecall to the `delegatee` with the incoming transaction data
+     * as the input and returns the result. The transaction data passed also includes 
+     * the function signature which determines what function is attempted to be called.
+     * 
+     * If the `delegatee` returns a ExtensionNotImplemented error, the `delegatee` is
+     * an extension that does not implement the function to be called.
+     *
+     * Otherwise, the function execution fails/succeeds as determined by the function 
+     * logic and returns as such.
+     */
+    function _delegate(address delegatee) internal virtual returns(bool) {
         bytes memory out;
 
-        (bool success, bytes memory result) = implementation.delegatecall(msg.data);
+        (bool success, bytes memory result) = delegatee.delegatecall(msg.data);
         assembly {
             returndatacopy(out, 0, returndatasize())
         }
@@ -38,7 +89,20 @@ contract Extendable {
             }
         }
     }
-
+    
+    /**
+     * @dev Delegates function calls to the specified `delegatee`.
+     *
+     * Performs a delegatecall to the `delegatee` with the incoming transaction data
+     * as the input and returns the result. The transaction data passed also includes 
+     * the function signature which determines what function is attempted to be called.
+     * 
+     * If the `delegatee` returns a ExtensionNotImplemented error, the `delegatee` is
+     * an extension that does not implement the function to be called.
+     *
+     * Otherwise, the function execution fails/succeeds as determined by the function 
+     * logic and returns as such.
+     */
     function _fallback() internal virtual {
         _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getStorage();
@@ -56,13 +120,30 @@ contract Extendable {
         }
     }
 
+    /**
+     * @dev Default fallback function to catch unrecognised selectors.
+     *
+     * Used in order to perform extension lookups by _fallback().
+     */
     fallback() external payable virtual {
         _fallback();
     }
     
+    /**
+     * @dev Payable fallback function to catch unrecognised selectors with ETH payments.
+     *
+     * Used in order to perform extension lookups by _fallback().
+     */
     receive() external payable virtual {
         _fallback();
     }
 
+    
+    /**
+     * @dev Virtual hook that is called before _fallback().
+     *
+     * Can be re-implemented by your contract to call certain functionality prior to
+     * the extension lookup.
+     */
     function _beforeFallback() internal virtual {}
 }

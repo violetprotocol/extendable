@@ -168,6 +168,14 @@ describe("ReplaceLogic", function () {
                     SHOULD_NOT_REVERT
                 );
             });
+
+            it("should register interface id during constructor correctly", async function () {
+                expect(await replaceLogic.callStatic.supportsInterface(REPLACE_LOGIC_INTERFACE)).to.be.true;
+            });
+        
+            it("should return interfaceId correctly", async function () {
+                expect(await replaceLogic.callStatic.getInterfaceId()).to.equal(REPLACE_LOGIC_INTERFACE);
+            });
         });
 
         describe("strict replace", () => {
@@ -196,6 +204,14 @@ describe("ReplaceLogic", function () {
                     [extendLogic.address, permissioningLogic.address, replaceLogic.address], 
                     SHOULD_NOT_REVERT
                 );
+            });
+
+            it("should register interface id during constructor correctly", async function () {
+                expect(await strictReplaceLogic.callStatic.supportsInterface(REPLACE_LOGIC_INTERFACE)).to.be.true;
+            });
+        
+            it("should return interfaceId correctly", async function () {
+                expect(await strictReplaceLogic.callStatic.getInterfaceId()).to.equal(REPLACE_LOGIC_INTERFACE);
             });
         });
     });

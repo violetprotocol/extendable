@@ -8,9 +8,10 @@ import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorag
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 contract RetractLogic is IRetractLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
 
     function retract(address extension) override public virtual {
         Permissions._onlyOwner();
@@ -38,6 +39,6 @@ contract RetractLogic is IRetractLogic, Extension {
     }
 
     function getInterface() override public pure returns(string memory) {
-        return "function retract(address extension) external;";
+        return "function retract(address extension) external;\n";
     }
 }

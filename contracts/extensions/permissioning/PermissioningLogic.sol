@@ -6,6 +6,11 @@ import "./IPermissioningLogic.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 contract PermissioningLogic is IPermissioningLogic, Extension {
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
+
+    
     function init() override public {
         RoleState storage state = Permissions._getStorage();
         require(state.owner == address(0x0), "already initialised"); // make sure owner has yet to be set for delegator
@@ -28,6 +33,8 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
     }
 
     function getInterface() override public pure returns(string memory) {
-        return "function init() external;function updateOwner(address newOwner) external;function getOwner() external view returns(address);";
+        return  "function init() external;\n"
+                "function updateOwner(address newOwner) external;\n"
+                "function getOwner() external view returns(address);\n";
     }
 }

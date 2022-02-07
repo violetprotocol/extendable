@@ -22,7 +22,7 @@ describe("Extendable", function () {
     let retractLogic;
     let newRetractLogic;
     let replaceLogic;
-    let stricReplaceLogic;
+    let strictReplaceLogic;
 
     before("deploy new", async function () {
         [account] = await ethers.getSigners();
@@ -60,11 +60,11 @@ describe("Extendable", function () {
         expect(await extendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
         expect(await extendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
         expect(await extendable.callStatic.getCurrentInterface()).to.equal("".concat(
-            "interface IExtended {",
-                "function extend(address extension) external;",
-                "function getCurrentInterface() external view returns(string memory);",
-                "function getExtensions() external view returns(bytes4[] memory);",
-                "function getExtensionAddresses() external view returns(address[] memory);",
+            "interface IExtended {\n",
+            "function extend(address extension) external;\n",
+            "function getCurrentInterface() external view returns(string memory);\n",
+            "function getExtensions() external view returns(bytes4[] memory);\n",
+            "function getExtensionAddresses() external view returns(address[] memory);\n",
             "}"
         ));
     });
@@ -79,14 +79,14 @@ describe("Extendable", function () {
             const extendablePer = await utils.getExtendedContractWithInterface(extendableAddress, "PermissioningLogic");
             expect(await extendablePer.callStatic.getOwner()).to.equal(account.address);
             expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                "interface IExtended {",
-                    "function extend(address extension) external;",
-                    "function getCurrentInterface() external view returns(string memory);",
-                    "function getExtensions() external view returns(bytes4[] memory);",
-                    "function getExtensionAddresses() external view returns(address[] memory);",
-                    "function init() external;",
-                    "function updateOwner(address newOwner) external;",
-                    "function getOwner() external view returns(address);",
+                "interface IExtended {\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
                 "}"
             ));
         });
@@ -98,15 +98,15 @@ describe("Extendable", function () {
             expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE]);
             expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, permissioningLogic.address, retractLogic.address]);
             expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                "interface IExtended {",
-                    "function extend(address extension) external;",
-                    "function getCurrentInterface() external view returns(string memory);",
-                    "function getExtensions() external view returns(bytes4[] memory);",
-                    "function getExtensionAddresses() external view returns(address[] memory);",
-                    "function init() external;",
-                    "function updateOwner(address newOwner) external;",
-                    "function getOwner() external view returns(address);",
-                    "function retract(address extension) external;",
+                "interface IExtended {\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function retract(address extension) external;\n",
                 "}"
             ));
         });
@@ -118,16 +118,16 @@ describe("Extendable", function () {
             expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
             expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, permissioningLogic.address, retractLogic.address, replaceLogic.address]);
             expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                "interface IExtended {",
-                    "function extend(address extension) external;",
-                    "function getCurrentInterface() external view returns(string memory);",
-                    "function getExtensions() external view returns(bytes4[] memory);",
-                    "function getExtensionAddresses() external view returns(address[] memory);",
-                    "function init() external;",
-                    "function updateOwner(address newOwner) external;",
-                    "function getOwner() external view returns(address);",
-                    "function retract(address extension) external;",
-                    "function replace(address oldExtension, address newExtension) external;",
+                "interface IExtended {\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function retract(address extension) external;\n",
+                    "function replace(address oldExtension, address newExtension) external;\n",
                 "}"
             ));
         });
@@ -142,15 +142,15 @@ describe("Extendable", function () {
             expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
             expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, permissioningLogic.address, replaceLogic.address]);
             expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                "interface IExtended {",
-                    "function extend(address extension) external;",
-                    "function getCurrentInterface() external view returns(string memory);",
-                    "function getExtensions() external view returns(bytes4[] memory);",
-                    "function getExtensionAddresses() external view returns(address[] memory);",
-                    "function init() external;",
-                    "function updateOwner(address newOwner) external;",
-                    "function getOwner() external view returns(address);",
-                    "function replace(address oldExtension, address newExtension) external;",
+                "interface IExtended {\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function replace(address oldExtension, address newExtension) external;\n",
                 "}"
             ));
         });
@@ -162,16 +162,16 @@ describe("Extendable", function () {
             expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE]);
             expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, permissioningLogic.address, replaceLogic.address, retractLogic.address]);
             expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                "interface IExtended {",
-                    "function extend(address extension) external;",
-                    "function getCurrentInterface() external view returns(string memory);",
-                    "function getExtensions() external view returns(bytes4[] memory);",
-                    "function getExtensionAddresses() external view returns(address[] memory);",
-                    "function init() external;",
-                    "function updateOwner(address newOwner) external;",
-                    "function getOwner() external view returns(address);",
-                    "function replace(address oldExtension, address newExtension) external;",
-                    "function retract(address extension) external;",
+                "interface IExtended {\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function replace(address oldExtension, address newExtension) external;\n",
+                    "function retract(address extension) external;\n",
                 "}"
             ));
         });
@@ -187,16 +187,16 @@ describe("Extendable", function () {
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE]);
                 expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, permissioningLogic.address, replaceLogic.address, newRetractLogic.address]);
                 expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                    "interface IExtended {",
-                        "function extend(address extension) external;",
-                        "function getCurrentInterface() external view returns(string memory);",
-                        "function getExtensions() external view returns(bytes4[] memory);",
-                        "function getExtensionAddresses() external view returns(address[] memory);",
-                        "function init() external;",
-                        "function updateOwner(address newOwner) external;",
-                        "function getOwner() external view returns(address);",
-                        "function replace(address oldExtension, address newExtension) external;",
-                        "function retract(address extension) external;",
+                    "interface IExtended {\n",
+                        "function extend(address extension) external;\n",
+                        "function getCurrentInterface() external view returns(string memory);\n",
+                        "function getExtensions() external view returns(bytes4[] memory);\n",
+                        "function getExtensionAddresses() external view returns(address[] memory);\n",
+                        "function init() external;\n",
+                        "function updateOwner(address newOwner) external;\n",
+                        "function getOwner() external view returns(address);\n",
+                        "function replace(address oldExtension, address newExtension) external;\n",
+                        "function retract(address extension) external;\n",
                     "}"
                 ));
             });
@@ -209,16 +209,16 @@ describe("Extendable", function () {
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE]);
                 expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, replaceLogic.address, newExtendLogic.address]);
                 expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                    "interface IExtended {",
-                        "function retract(address extension) external;",
-                        "function init() external;",
-                        "function updateOwner(address newOwner) external;",
-                        "function getOwner() external view returns(address);",
-                        "function replace(address oldExtension, address newExtension) external;",
-                        "function extend(address extension) external;",
-                        "function getCurrentInterface() external view returns(string memory);",
-                        "function getExtensions() external view returns(bytes4[] memory);",
-                        "function getExtensionAddresses() external view returns(address[] memory);",
+                    "interface IExtended {\n",
+                        "function retract(address extension) external;\n",
+                        "function init() external;\n",
+                        "function updateOwner(address newOwner) external;\n",
+                        "function getOwner() external view returns(address);\n",
+                        "function replace(address oldExtension, address newExtension) external;\n",
+                        "function extend(address extension) external;\n",
+                        "function getCurrentInterface() external view returns(string memory);\n",
+                        "function getExtensions() external view returns(bytes4[] memory);\n",
+                        "function getExtensionAddresses() external view returns(address[] memory);\n",
                     "}"
                 ));
             });
@@ -234,16 +234,16 @@ describe("Extendable", function () {
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE]);
                 expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, strictReplaceLogic.address, extendLogic.address]);
                 expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                    "interface IExtended {",
-                        "function retract(address extension) external;",
-                        "function init() external;",
-                        "function updateOwner(address newOwner) external;",
-                        "function getOwner() external view returns(address);",
-                        "function replace(address oldExtension, address newExtension) external;",
-                        "function extend(address extension) external;",
-                        "function getCurrentInterface() external view returns(string memory);",
-                        "function getExtensions() external view returns(bytes4[] memory);",
-                        "function getExtensionAddresses() external view returns(address[] memory);",
+                    "interface IExtended {\n",
+                        "function retract(address extension) external;\n",
+                        "function init() external;\n",
+                        "function updateOwner(address newOwner) external;\n",
+                        "function getOwner() external view returns(address);\n",
+                        "function replace(address oldExtension, address newExtension) external;\n",
+                        "function extend(address extension) external;\n",
+                        "function getCurrentInterface() external view returns(string memory);\n",
+                        "function getExtensions() external view returns(bytes4[] memory);\n",
+                        "function getExtensionAddresses() external view returns(address[] memory);\n",
                     "}"
                 ));
             });
@@ -256,16 +256,16 @@ describe("Extendable", function () {
                 expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE]);
                 expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, extendLogic.address, replaceLogic.address]);
                 expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
-                    "interface IExtended {",
-                        "function retract(address extension) external;",
-                        "function init() external;",
-                        "function updateOwner(address newOwner) external;",
-                        "function getOwner() external view returns(address);",
-                        "function extend(address extension) external;",
-                        "function getCurrentInterface() external view returns(string memory);",
-                        "function getExtensions() external view returns(bytes4[] memory);",
-                        "function getExtensionAddresses() external view returns(address[] memory);",
-                        "function replace(address oldExtension, address newExtension) external;",
+                    "interface IExtended {\n",
+                        "function retract(address extension) external;\n",
+                        "function init() external;\n",
+                        "function updateOwner(address newOwner) external;\n",
+                        "function getOwner() external view returns(address);\n",
+                        "function extend(address extension) external;\n",
+                        "function getCurrentInterface() external view returns(string memory);\n",
+                        "function getExtensions() external view returns(bytes4[] memory);\n",
+                        "function getExtensionAddresses() external view returns(address[] memory);\n",
+                        "function replace(address oldExtension, address newExtension) external;\n",
                     "}"
                 ));
             });
