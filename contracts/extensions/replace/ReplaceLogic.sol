@@ -9,16 +9,23 @@ import "../retract/IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-// Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
-// Replaces any old extension with any new extension except
-// for ExtendLogic where new extension must match interfaceId
-// Safer than ReplaceLogic
+/**
+ * @dev Reference implementation for ReplaceLogic which defines a basic extension
+ *      replacement algorithm.
+*/
 contract ReplaceLogic is IReplaceLogic, Extension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
 
-    
+    /**
+     * @dev Replaces any old extension with any new extension.
+     *
+     * Uses RetractLogic to remove old and ExtendLogic to add new.
+     *
+     * If ExtendLogic is being replaced, ensure that the new extension implements IExtendLogic
+     * and use low-level calls to extend.
+    */
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
 
@@ -26,15 +33,15 @@ contract ReplaceLogic is IReplaceLogic, Extension {
         IRetractLogic retractLogic = IRetractLogic(payable(address(this)));
         IExtendLogic extendLogic = IExtendLogic(payable(address(this)));
 
-        // remove old extension by using current retract logic instead of implementing conflicting logic
+        // Remove old extension by using current retract logic instead of implementing conflicting logic
         retractLogic.retract(oldExtension);
 
-        // attempt to extend with new extension
+        // Attempt to extend with new extension
         try extendLogic.extend(newExtension) {
-            // pass
+            // success
         } catch Error(string memory reason) {
             revert(reason);
-        } catch (bytes memory err) { // if it fails, check if this is due to extend being removed
+        } catch (bytes memory err) { // if it fails, check if this is due to extend being replaced
             if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
                 require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
@@ -56,10 +63,16 @@ contract ReplaceLogic is IReplaceLogic, Extension {
         }
     }
 
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
     function getInterfaceId() override public pure returns(bytes4) {
         return (type(IReplaceLogic).interfaceId);
     }
 
+    /**
+     * @dev see {IExtension-getInterface}
+    */
     function getInterface() override public pure returns(string memory) {
         return "function replace(address oldExtension, address newExtension) external;\n";
     }

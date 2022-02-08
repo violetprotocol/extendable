@@ -21,7 +21,7 @@ library StorageTemplate {
     // This is used in combination with delegator address to locate your struct in storage
     // Choose something that is human readable/understandable and unique to avoid potential
     // collisions with other potential storage libraries used by the same delegator
-    bytes32 constant STORAGE_NAME = keccak256("your_unique_storage_identifier");
+    bytes32 constant private STORAGE_NAME = keccak256("your_unique_storage_identifier");
 
     function _getStorage()
         internal 

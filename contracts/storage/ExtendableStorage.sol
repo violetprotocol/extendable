@@ -16,7 +16,7 @@ struct ExtendableState {
  * @dev Storage library to access storage slot for the state struct
  */
 library ExtendableStorage {
-    bytes32 constant STORAGE_NAME = keccak256("extendable");
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:extendable-state");
 
     function _getStorage()
         internal 

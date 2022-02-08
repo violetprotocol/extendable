@@ -3,6 +3,8 @@
   "plugins": ["prettier"],
   "rules": {
     "compiler-version": ["error", "^0.8.0"],
-    "no-inline-assembly": "off"
+    "no-inline-assembly": "off",
+    "avoid-low-level-calls": "off",
+    "no-empty-blocks": "off"
   }
 }

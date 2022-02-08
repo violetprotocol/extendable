@@ -9,7 +9,7 @@ struct RoleState {
 }
 
 library Permissions {
-    bytes32 constant STORAGE_NAME = keccak256("permissions");
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:permissions-state");
 
     function _getStorage()
         internal 

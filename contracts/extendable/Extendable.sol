@@ -48,8 +48,14 @@ contract Extendable {
      * PermissioningLogic extension, giving it access to permissioning management.
      */
     constructor(address extendLogic, address permissionLogic) {
+        // initialise contract deployer as `owner` in storage state
         (bool permSuccess, ) = permissionLogic.delegatecall(abi.encodeWithSignature("init()"));
+
+        // extend extendable contract with the first extension: extend, using itself in low-level call
+        // requires extender to be `owner` in reference implementation
         (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
+
+        // check that initialisation tasks were successful
         require(permSuccess, "failed to initialise permissioning");
         require(extendSuccess, "failed to initialise extension");
     }
@@ -69,21 +75,27 @@ contract Extendable {
      */
     function _delegate(address delegatee) internal virtual returns(bool) {
         bytes memory out;
-
         (bool success, bytes memory result) = delegatee.delegatecall(msg.data);
+
+        // copy all returndata to `out` once instead of duplicating copy for each conditional branch
         assembly {
             returndatacopy(out, 0, returndatasize())
         }
 
+        // if the delegatecall execution did not succeed
         if (!success) {
+            // check if failure was due to an ExtensionNotImplemented error
             if (Errors.catchCustomError(result, ExtensionNotImplemented.selector)) {
+                // cleanly return false if error is caught
                 return false;
             } else {
+                // otherwise revert, passing in copied full returndata
                 assembly {
                     revert(out, returndatasize())
                 }
             }
         } else {
+            // otherwise end execution and return the copied full returndata
             assembly {
                 return(out, returndatasize())
             }
@@ -91,17 +103,16 @@ contract Extendable {
     }
     
     /**
-     * @dev Delegates function calls to the specified `delegatee`.
+     * @dev Internal fallback function logic that attempts to delegate execution
+     *      to extension contracts
      *
-     * Performs a delegatecall to the `delegatee` with the incoming transaction data
-     * as the input and returns the result. The transaction data passed also includes 
-     * the function signature which determines what function is attempted to be called.
-     * 
-     * If the `delegatee` returns a ExtensionNotImplemented error, the `delegatee` is
-     * an extension that does not implement the function to be called.
+     * Initially attempts to locate an interfaceId match with a function selector
+     * which are extensions that house single functions (singleton extensions)
+     * If none is found then attempt execution by cycling through extensions and
+     * calling.
      *
-     * Otherwise, the function execution fails/succeeds as determined by the function 
-     * logic and returns as such.
+     * If no implementations are found that match the requested function signature,
+     * returns ExtensionNotImplemented error
      */
     function _fallback() internal virtual {
         _beforeFallback();
@@ -109,7 +120,7 @@ contract Extendable {
 
         if (state.extensionContracts[msg.sig] != address(0x0)) { // if an extension exists that matches in the functionsig, call it
             _delegate(state.extensionContracts[msg.sig]);
-        } else {                                                   // else cycle through all extensions to find it if exists
+        } else {                                                 // else cycle through all extensions to find it if exists
             bool ok = false;
             for (uint i = 0; i < state.interfaceIds.length; i++) {
                 ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
