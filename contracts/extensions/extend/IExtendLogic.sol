@@ -13,8 +13,8 @@ interface IExtendLogic {
      * Requirements:
      *  - `extension` contract must implement EIP-165.
      *  - Records `extension` in the ExtendableStorage module.
-     *  - Fail if `extension` does not implement IExtension
-     *  - Fail if the interfaceId of the `candidate` extension matches that of an existing 
+     *  - `extension` must inherit IExtension
+     *  - The interfaceId of the "candidate" extension must not match that of an existing 
      *    attached extension
     */
     function extend(address extension) external;
