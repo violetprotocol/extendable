@@ -19,7 +19,7 @@ contract ReplaceLogic is IReplaceLogic, Extension {
     */
 
     /**
-     * @dev Replaces any old extension with any new extension.
+     * @dev see {IReplaceLogic-replace} Replaces any old extension with any new extension.
      *
      * Uses RetractLogic to remove old and ExtendLogic to add new.
      *

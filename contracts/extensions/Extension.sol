@@ -24,7 +24,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
  */
 abstract contract Extension is ERC165Storage, IExtension {
     /**
-     * @dev constructor registers your custom Extension interface under EIP-165:
+     * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
     */
     constructor() {
@@ -33,7 +33,7 @@ abstract contract Extension is ERC165Storage, IExtension {
     }
 
     /**
-     * @dev unidentified function signature calls to any Extension reverts with
+     * @dev Unidentified function signature calls to any Extension reverts with
      *      ExtensionNotImplemented error
     */
     function _fallback() internal virtual {
@@ -41,21 +41,21 @@ abstract contract Extension is ERC165Storage, IExtension {
     }
 
     /**
-     * @dev fallback function passes to internal _fallback() logic
+     * @dev Fallback function passes to internal _fallback() logic
     */
     fallback() external payable virtual {
         _fallback();
     }
     
     /**
-     * @dev payable fallback function passes to internal _fallback() logic
+     * @dev Payable fallback function passes to internal _fallback() logic
     */
     receive() external payable virtual {
         _fallback();
     }
 
     /**
-     * @dev virtual override declaration of getInterfaceId() function
+     * @dev Virtual override declaration of getInterfaceId() function
      *
      * Must be implemented in inherited contract.
     */

@@ -2,18 +2,33 @@
   "name": "extendable",
   "version": "1.0.0",
   "description": "Extendable smart contract pattern",
-  "main": "index.js",
+  "files": [
+    "/contracts/**/*.sol",
+    "/artifacts/contracts/**/*.json",
+    "!/artifacts/contracts/mock/**/*",
+    "!/contracts/mock/**/*"
+  ],
   "scripts": {
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"./test/**/*.js\"",
     "lint:sol": "solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
     "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts}\"",
+    "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
     "test": "hardhat test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/violetprotocol/extendable.git"
   },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "extendable", 
+    "proxy",
+    "upgradeable"
+  ],
   "author": "papasmurf",
   "license": "MIT",
   "bugs": {
@@ -24,6 +39,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
+    "@tenderly/hardhat-tenderly": "^1.0.13",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
@@ -38,7 +54,6 @@
     "web3": "^1.5.2"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.0",
-    "@tenderly/hardhat-tenderly": "^1.0.13"
+    "@openzeppelin/contracts": "^4.3.0"
   }
 }

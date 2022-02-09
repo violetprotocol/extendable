@@ -6,7 +6,7 @@ pragma solidity ^0.8.4;
 */
 interface IExtension {
     /**
-     * @dev returns a full view of the functional interface of the extension
+     * @dev Returns a full view of the functional interface of the extension
      *
      * Must return a list of the functions in the interface of your custom Extension
      * in the same format and syntax as in the interface itself as a string, 
@@ -25,7 +25,7 @@ interface IExtension {
     function getInterface() external pure returns(string memory);
 
     /**
-     * @dev returns the interfaceId of current custom Extension interface
+     * @dev Returns the interfaceId of current custom Extension interface
      * 
      * Provides a simple abstraction from the developer for any custom Extension to 
      * be EIP-165 compliant out-of-the-box simply by implementing this function.

@@ -118,9 +118,13 @@ contract Extendable {
         _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getStorage();
 
-        if (state.extensionContracts[msg.sig] != address(0x0)) { // if an extension exists that matches in the functionsig, call it
+        // if an extension exists that matches in the functionsig
+        if (state.extensionContracts[msg.sig] != address(0x0)) {
+            // call it
             _delegate(state.extensionContracts[msg.sig]);
-        } else {                                                 // else cycle through all extensions to find it if exists
+        } else {                                                 
+            // else cycle through all extensions to find it if exists
+            // this is not the preferred method for usage and only acts as a fallback
             bool ok = false;
             for (uint i = 0; i < state.interfaceIds.length; i++) {
                 ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
