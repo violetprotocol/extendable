@@ -12,7 +12,7 @@ interface IExtendLogic {
      *
      * Requirements:
      *  - `extension` contract must implement EIP-165.
-     *  - Records `extension` in the ExtendableStorage module.
+     *  - Must record the `extension` by both its interfaceId and address
      *  - `extension` must inherit IExtension
      *  - The interfaceId of the "candidate" extension must not match that of an existing 
      *    attached extension
