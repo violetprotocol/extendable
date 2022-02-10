@@ -14,7 +14,11 @@
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
     "prettier:check": "prettier --check \"**/*.{js,json,md,sol,ts}\"",
     "gas-report": "env ENABLE_GAS_REPORT=true yarn test",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "compile": "hardhat compile",
+    "clean": "hardhat clean && rimraf build contracts/build",
+    "prepare": "yarn clean && env COMPILE_MODE=production yarn compile",
+    "prepack": "scripts/prepack.sh"
   },
   "repository": {
     "type": "git",
@@ -25,7 +29,7 @@
     "ethereum",
     "smart",
     "contracts",
-    "extendable", 
+    "extendable",
     "proxy",
     "upgradeable"
   ],
@@ -48,6 +52,7 @@
     "hardhat-gas-reporter": "^1.0.6",
     "prettier": "^2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
+    "rimraf": "^3.0.2",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.17",
