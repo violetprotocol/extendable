@@ -1,6 +1,6 @@
 # Releasing
 
-To cut a new release, first create a pull request from `dev` into `main` with the [semver](https://semver.org/) naming convention. For example `1.0.0.-rc1`. This will enter wider team review and further testing where necessary to ensure bug-free code and presentableness to public.
+To cut a new release, first create a pull request from `dev` into `main` with the [semver](https://semver.org/) naming convention. For example `1.0.0-rc1`. This will enter wider team review and further testing where necessary to ensure bug-free code and presentableness to public.
 
 ## Testing
 
