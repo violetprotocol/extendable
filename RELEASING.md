@@ -49,3 +49,5 @@ $ yarn prepare
 $ npm login --scope=@violetprotocol
 $ npm publish --access public --tag <version>
 ```
+
+Ensure that the tag includes a changelog that documents the feature changes/additions/fixes that were included in the version that diff from the previous release.
