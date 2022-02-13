@@ -22,7 +22,7 @@ Enter the contracts directory:
 $ cd contracts
 ```
 
-Test the npm package with by:
+Test the npm package with:
 ```bash
 $ yarn pack
 ```
