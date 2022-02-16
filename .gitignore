@@ -1,0 +1,14 @@
+node_modules
+.DS_Store
+.env
+
+#Hardhat files
+cache
+artifacts
+
+#Release build
+contracts/build
+contracts/README.md
+build
+
+coverage*

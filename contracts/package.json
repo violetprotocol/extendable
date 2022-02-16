@@ -1,0 +1,32 @@
+{
+  "name": "@violetprotocol/extendable",
+  "description": "Extendable smart contract pattern for Solidity",
+  "version": "1.0.0",
+  "files": [
+    "**/*.sol",
+    "/build/contracts/*.json",
+    "!/mock/**/*"
+  ],
+  "scripts": {
+    "prepare": "bash ../scripts/prepare-contracts.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/violetprotocol/extendable.git"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "extendable",
+    "proxy",
+    "upgradeable"
+  ],
+  "author": "papasmurf",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/violetprotocol/extendable/issues"
+  },
+  "homepage": "https://github.com/violetprotocol/extendable#readme"
+}
