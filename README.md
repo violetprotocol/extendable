@@ -10,8 +10,9 @@ contract YourContract is Extendable {
 }
 ```
 
-```solidity
-YourContract.extend(extension);
+```
+> deploy(YourContract)
+> YourContract.extend(extension);
 ```
 
 ## Architecture
@@ -32,11 +33,60 @@ _Extension_ logic contracts implement functional logic that is called by the _Ex
 
 _Extension_ logic contracts can mutate state by accessing the storage of the delegator through custom storage slot access. Various different _Extension_ logic contracts can access the same state but extensions should be written and extended mindfully to avoid incorrect state mutability.
 
+```solidity
+import "@violetprotocol/extendable/extensions/Extension.sol";
+
+contract YourExtension is IYourExtension, Extension {
+    ...
+}
+```
+
+```
+> deploy(YourExtension)
+0x7F5b1b0a4929BF2bD9502CBF714c166931FC85dD
+> YourContract.extend(0x7F5b1b0a4929BF2bD9502CBF714c166931FC85dD)
+```
+
 ### Storage
 
 _Storage_ contracts define state variables that intend to be stored and used by an _Extendable_ contract and accessed by _Extension_ logic contracts. It uses a storage slot locator model where storage is allocated and accessed by address and different structures/types are located in different places to avoid collision.
 
 _Storage_ contracts are libraries that are imported by the contract that requires access to storage state. These contracts can include reusable functions that might be useful related to computation over state (such as modifiers or _get_ functions).
+
+```solidity
+struct YourState {
+    // State variables are declared here
+}
+
+library YourStorage {
+    bytes32 constant private STORAGE_NAME = keccak256("your_unique_storage_identifier");
+
+    function _getStorage()
+        internal 
+        view
+        returns (YourState storage state) 
+    {
+        bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
+        assembly {
+            state.slot := position
+        }
+    }
+}
+```
+
+```solidity
+import "@violetprotocol/extendable/extensions/Extension.sol";
+import "./YourStorage.sol";
+
+contract YourExtension is IYourExtension, Extension {
+    function readStorage() public view {
+        YourState storage state = YourStorage._getStorage();
+
+        // access properties of state with `state.yourVar`
+        // re-assign state properties with `state.yourVar = <value>`
+    }
+}
+```
 
 ## Requirements
 
