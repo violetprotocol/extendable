@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: LGPL-3.0
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
@@ -8,21 +8,29 @@ import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorag
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 contract RetractLogic is IRetractLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
 
+    /**
+     * @dev see {IRetractLogic-retract}
+    */
     function retract(address extension) override public virtual {
         Permissions._onlyOwner();
 
         ExtendableState storage state = ExtendableStorage._getStorage();
+
+        // Search for extension in interfaceIds
         for (uint i = 0; i < state.interfaceIds.length; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
             address currentExtension = state.extensionContracts[interfaceId];
+
+            // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
+                // Remove from mapping
                 delete state.extensionContracts[interfaceId];
 
-                // swap with final item and pop from array
+                // Swap interfaceId with final item and pop from array for constant time array removal
                 state.interfaceIds[i] = state.interfaceIds[state.interfaceIds.length - 1];
                 state.interfaceIds.pop();
 
@@ -33,11 +41,17 @@ contract RetractLogic is IRetractLogic, Extension {
         revert("Retract: specified extension is not an extension of this contract, cannot retract");
     }
 
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
     function getInterfaceId() override public pure returns(bytes4) {
         return (type(IRetractLogic).interfaceId);
     }
 
+    /**
+     * @dev see {IExtension-getInterface}
+    */
     function getInterface() override public pure returns(string memory) {
-        return "function retract(address extension) external;";
+        return "function retract(address extension) external;\n";
     }
 }

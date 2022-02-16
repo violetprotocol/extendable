@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: LGPL-3.0
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
@@ -9,48 +9,71 @@ import "../retract/IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-// Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
+/**
+ * @dev Reference implementation for ReplaceLogic which defines a basic extension
+ *      replacement algorithm.
+*/
 contract ReplaceLogic is IReplaceLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
 
+    /**
+     * @dev see {IReplaceLogic-replace} Replaces any old extension with any new extension.
+     *
+     * Uses RetractLogic to remove old and ExtendLogic to add new.
+     *
+     * If ExtendLogic is being replaced, ensure that the new extension implements IExtendLogic
+     * and use low-level calls to extend.
+    */
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
 
         // Initialise both prior to state change for safety
         IRetractLogic retractLogic = IRetractLogic(payable(address(this)));
+        IExtendLogic extendLogic = IExtendLogic(payable(address(this)));
 
-        // remove old extension by using current retract logic instead of implementing conflicting logic
+        // Remove old extension by using current retract logic instead of implementing conflicting logic
         retractLogic.retract(oldExtension);
 
-        // check if we are replacing ExtendLogic with new
-        IExtension old = IExtension(payable(oldExtension));
-        bool isReplacingExtend = old.getInterfaceId() == type(IExtendLogic).interfaceId;
-        if (isReplacingExtend) {
-            require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
+        // Attempt to extend with new extension
+        try extendLogic.extend(newExtension) {
+            // success
+        } catch Error(string memory reason) {
+            revert(reason);
+        } catch (bytes memory err) { // if it fails, check if this is due to extend being replaced
+            if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
+                require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
-            // check if new extension implements the correct interface
-            IExtension newEx = IExtension(payable(newExtension));
+                IExtension old = IExtension(payable(oldExtension));
+                IExtension newEx = IExtension(payable(newExtension));
 
-            // upgrade this contract with modified equality below to enforce a specific new ExtendLogic interface
-            require(newEx.getInterfaceId() == old.getInterfaceId(), "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces");
-            
-            // use raw delegate call to re-extend the extension because we have just removed the Extend function
-            (bool extendSuccess, ) = newExtension.delegatecall(abi.encodeWithSignature("extend(address)", newExtension));
-            require(extendSuccess, "Replace: failed to replace extend");
-        } else {
-            // reregister using current extend logic instead of implementing conflicting logic
-            IExtendLogic extendLogic = IExtendLogic(payable(address(this)));
-            extendLogic.extend(newExtension);
+                // upgrade this contract with modified equality below to enforce a specific new ExtendLogic interface
+                require(newEx.getInterfaceId() == old.getInterfaceId(), "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces");
+                
+                // use raw delegate call to re-extend the extension because we have just removed the Extend function
+                (bool extendSuccess, ) = newExtension.delegatecall(abi.encodeWithSignature("extend(address)", newExtension));
+                require(extendSuccess, "Replace: failed to replace extend");
+            } else {
+                uint errLen = err.length;
+                assembly {
+                    revert(err, errLen)
+                }
+            }
         }
     }
 
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
     function getInterfaceId() override public pure returns(bytes4) {
         return (type(IReplaceLogic).interfaceId);
     }
 
+    /**
+     * @dev see {IExtension-getInterface}
+    */
     function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;";
+        return "function replace(address oldExtension, address newExtension) external;\n";
     }
 }

@@ -3,11 +3,10 @@ const { ethers } = require("hardhat");
 const web3 = require("web3");
 const chai = require("chai");
 const utils = require("../utils/utils")
+const { EXTEND_LOGIC_INTERFACE } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect, assert } = chai;
-
-const EXTEND_LOGIC_INTERFACE = "0xa501cf1f";
 
 describe("ExtendLogic", function () {
     let account;
@@ -44,6 +43,12 @@ describe("ExtendLogic", function () {
 
     it("extend should fail with non-contract address", async function () {
         await expect(caller.callExtend(account.address)).to.be.revertedWith("Extend: address is not a contract");
+        expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
+        expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
+    });
+
+    it("extend should fail with non-owner caller", async function () {
+        await expect(caller.connect(account2).callExtend(extendLogic.address)).to.be.revertedWith("unauthorised");
         expect(await caller.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
     });

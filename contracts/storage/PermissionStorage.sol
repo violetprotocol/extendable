@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: LGPL-3.0
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
@@ -9,7 +9,7 @@ struct RoleState {
 }
 
 library Permissions {
-    bytes32 constant STORAGE_NAME = keccak256("permissions");
+    bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:permissions-state");
 
     function _getStorage()
         internal 
@@ -37,8 +37,6 @@ library Permissions {
         
         // In order to check msg.sender properly here, we ensure that the caller is the current contract and then check tx.origin
         require(state.owner == msg.sender || (state.owner == tx.origin && msg.sender == address(this)), "unauthorised"); // Exercise EXTREME CAUTION when using this pattern elsewhere
-        
-
     }
 
     function migrateTo(bytes32 newStorageName) internal {

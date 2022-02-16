@@ -82,4 +82,12 @@ describe("RetractLogic", function () {
         expect(await caller.callStatic.getExtensions()).to.deep.equal([REPLACE_LOGIC_INTERFACE, RETRACT_LOGIC_INTERFACE]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([replaceLogic.address, retractLogic.address]);
     });
+
+    it("should register interface id during constructor correctly", async function () {
+        expect(await retractLogic.callStatic.supportsInterface(RETRACT_LOGIC_INTERFACE)).to.be.true;
+    });
+
+    it("should return interfaceId correctly", async function () {
+        expect(await retractLogic.callStatic.getInterfaceId()).to.equal(RETRACT_LOGIC_INTERFACE);
+    });
 });

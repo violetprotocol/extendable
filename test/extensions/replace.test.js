@@ -22,7 +22,6 @@ describe("ReplaceLogic", function () {
     let mockNewExtendLogic;
     let retractLogic;
     let replaceLogic;
-    let alterReplaceLogic;
     let strictReplaceLogic;
     let mockNewReplaceLogic;
     let caller;
@@ -35,7 +34,6 @@ describe("ReplaceLogic", function () {
         const MockNewExtendLogic = await ethers.getContractFactory("MockNewExtendLogic");
         const RetractLogic = await ethers.getContractFactory("RetractLogic");
         const ReplaceLogic = await ethers.getContractFactory("ReplaceLogic");
-        const AlterReplaceLogic = await ethers.getContractFactory("AlterReplaceLogic");
         const StrictReplaceLogic = await ethers.getContractFactory("StrictReplaceLogic");
         const MockNewReplaceLogic = await ethers.getContractFactory("MockNewReplaceLogic");
         const ReplaceCaller = await ethers.getContractFactory("ReplaceCaller");
@@ -46,7 +44,6 @@ describe("ReplaceLogic", function () {
         mockNewExtendLogic = await MockNewExtendLogic.deploy();
         retractLogic = await RetractLogic.deploy();
         replaceLogic = await ReplaceLogic.deploy();
-        alterReplaceLogic = await AlterReplaceLogic.deploy();
         strictReplaceLogic = await StrictReplaceLogic.deploy();
         mockNewReplaceLogic = await MockNewReplaceLogic.deploy();
 
@@ -56,7 +53,6 @@ describe("ReplaceLogic", function () {
         await mockNewExtendLogic.deployed();
         await retractLogic.deployed();
         await replaceLogic.deployed();
-        await alterReplaceLogic.deployed();
         await strictReplaceLogic.deployed();
         await mockNewReplaceLogic.deployed();
 
@@ -98,7 +94,7 @@ describe("ReplaceLogic", function () {
     })
 
     describe("replace", () => {
-        describe("simple replace", () => {
+        describe("default replace", () => {
             it("replace should fail with non-owner caller", async function () {
                 await replace(caller.connect(account2),
                     extendLogic.address, newExtendLogic.address,
@@ -164,42 +160,30 @@ describe("ReplaceLogic", function () {
                 );
             });
         
-            it("replace with alterative replace extension should succeed", async function () {
+            it("replace with strict replace extension should succeed", async function () {
                 await replace(caller,
-                    replaceLogic.address, alterReplaceLogic.address,
+                    replaceLogic.address, strictReplaceLogic.address,
                     [EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE], 
-                    [newExtendLogic.address, permissioningLogic.address, alterReplaceLogic.address], 
+                    [newExtendLogic.address, permissioningLogic.address, strictReplaceLogic.address], 
                     SHOULD_NOT_REVERT
                 );
             });
-        });
 
-        describe("alternative replace", () => {
-            it("alternative replace extend should succeed", async function () {
-                await replace(caller,
-                    newExtendLogic.address, extendLogic.address,
-                    [REPLACE_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE], 
-                    [alterReplaceLogic.address, permissioningLogic.address, extendLogic.address], 
-                    SHOULD_NOT_REVERT
-                );
+            it("should register interface id during constructor correctly", async function () {
+                expect(await replaceLogic.callStatic.supportsInterface(REPLACE_LOGIC_INTERFACE)).to.be.true;
             });
         
-            it("alternative replace with strict replace extension should succeed", async function () {
-                await replace(caller,
-                    alterReplaceLogic.address, strictReplaceLogic.address,
-                    [EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE], 
-                    [extendLogic.address, permissioningLogic.address, strictReplaceLogic.address], 
-                    SHOULD_NOT_REVERT
-                );
+            it("should return interfaceId correctly", async function () {
+                expect(await replaceLogic.callStatic.getInterfaceId()).to.equal(REPLACE_LOGIC_INTERFACE);
             });
         });
 
         describe("strict replace", () => {
             it("strict replace extend should succeed", async function () {
                 await replace(caller,
-                    extendLogic.address, newExtendLogic.address,
+                    newExtendLogic.address, extendLogic.address,
                     [REPLACE_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE], 
-                    [strictReplaceLogic.address, permissioningLogic.address, newExtendLogic.address], 
+                    [strictReplaceLogic.address, permissioningLogic.address, extendLogic.address], 
                     SHOULD_NOT_REVERT
                 );
             });
@@ -208,18 +192,26 @@ describe("ReplaceLogic", function () {
                 await replace(caller,
                     strictReplaceLogic.address, mockNewReplaceLogic.address,
                     [REPLACE_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE], 
-                    [strictReplaceLogic.address, permissioningLogic.address, newExtendLogic.address],
+                    [strictReplaceLogic.address, permissioningLogic.address, extendLogic.address],
                     "Replace: interface of new does not match old, please only use identical interfaces"
                 );
             });
         
             it("strict replace with same interface should succeed", async function () {
-                await replace(caller, 
-                    strictReplaceLogic.address, alterReplaceLogic.address,
+                await replace(caller,
+                    strictReplaceLogic.address, replaceLogic.address,
                     [EXTEND_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE],
-                    [newExtendLogic.address, permissioningLogic.address, alterReplaceLogic.address], 
+                    [extendLogic.address, permissioningLogic.address, replaceLogic.address], 
                     SHOULD_NOT_REVERT
                 );
+            });
+
+            it("should register interface id during constructor correctly", async function () {
+                expect(await strictReplaceLogic.callStatic.supportsInterface(REPLACE_LOGIC_INTERFACE)).to.be.true;
+            });
+        
+            it("should return interfaceId correctly", async function () {
+                expect(await strictReplaceLogic.callStatic.getInterfaceId()).to.equal(REPLACE_LOGIC_INTERFACE);
             });
         });
     });

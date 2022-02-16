@@ -1,4 +1,4 @@
-//SPDX-License-Identifier: LGPL-3.0
+//SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
@@ -11,14 +11,22 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
 // Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
 // Only allows replacement of extensions that share the exact same interface
+// Safest ReplaceLogic extension
 contract StrictReplaceLogic is IReplaceLogic, Extension {
-    constructor() {
-        _registerInterface(getInterfaceId());
-    }
+    /**
+     * @dev see {Extension-constructor} for constructor
+    */
 
+    /**
+     * @dev see {IReplaceLogic-replace} Replaces an old extension with a new extension that matches the old interface.
+     *
+     * Uses RetractLogic to remove old and ExtendLogic to add new.
+     *
+     * Strictly only allows replacement of extensions with new implementations of the same interface.
+    */
     function replace(address oldExtension, address newExtension) public override virtual {
         Permissions._onlyOwner();
-        
+
         require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
         IExtension old = IExtension(payable(oldExtension));
@@ -34,8 +42,10 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
 
         // attempt to extend with new extension
         try extendLogic.extend(newExtension) {
-            // pass
-        } catch (bytes memory err) { // if it fails, check if this is due to extend being removed
+            // success
+        }  catch Error(string memory reason) {
+            revert(reason);
+        } catch (bytes memory err) { // if it fails, check if this is due to extend being replaced
             if (Errors.catchCustomError(err, ExtensionNotImplemented.selector)) { // make sure this is a not implemented error due to removal of Extend
                 // use raw delegate call to re-extend the extension because we have just removed the Extend function
                 (bool extendSuccess, ) = newExtension.delegatecall(abi.encodeWithSignature("extend(address)", newExtension));
@@ -54,6 +64,6 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
     }
 
     function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;";
+        return "function replace(address oldExtension, address newExtension) external;\n";
     }
 }

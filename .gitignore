@@ -6,4 +6,9 @@ node_modules
 cache
 artifacts
 
+#Release build
+contracts/build
+contracts/README.md
+build
+
 coverage*
