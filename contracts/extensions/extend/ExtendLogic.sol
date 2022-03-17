@@ -24,8 +24,16 @@ contract ExtendLogic is IExtendLogic, Extension {
 
     /**
      * @dev see {IExtendLogic-extend}
+     *
+     * Uses PermissioningLogic implementation with `owner` checks.
+     *
+     * Restricts extend to `onlyOwner`.
+     *
+     * If `owner` has not been initialised, assume that this is the initial extend call
+     * during constructor of Extendable and instantiate `owner` as the caller.
     */
     function extend(address extension) override public virtual {
+        initialise();
         Permissions._onlyOwner();
         
         require(extension.code.length > 0, "Extend: address is not a contract");
@@ -93,5 +101,21 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
     function getInterfaceId() override public pure returns(bytes4) {
         return(type(IExtendLogic).interfaceId);
+    }
+
+
+    /**
+     * @dev Sets the owner of the contract to the tx origin if unset
+     *
+     * Used by Extendable during first extend to set deployer as the owner that can
+     * extend the contract
+    */
+    function initialise() internal {
+        RoleState storage state = Permissions._getStorage();
+
+        // Set the owner to the transaction sender if owner has not been initialised
+        if (state.owner == address(0x0)) {
+            state.owner = tx.origin;
+        }
     }
 }

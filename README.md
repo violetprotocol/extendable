@@ -5,6 +5,8 @@ Upgradeable, modular, extensible smart contracts using Extendable<>Extension arc
 Add and remove selectively modular parts of functional logic known as Extensions, accessing modular storage definitions.
 
 ```solidity
+import "@violetprotocol/extendable/extendable/Extendable.sol";
+
 contract YourContract is Extendable {
     ...
 }
@@ -13,6 +15,28 @@ contract YourContract is Extendable {
 ```
 > deploy(YourContract)
 > YourContract.extend(extension);
+```
+
+### Get started!
+
+Simply install our package and get implementing!
+
+```bash
+npm install @violetprotocol/extendable
+```
+
+```bash
+yarn add @violetprotocol/extendable
+```
+
+Then import our library during development:
+
+```solidity
+import "@violetprotocol/extendable/extendable/Extendable.sol";
+import "@violetprotocol/extendable/extensions/Extension.sol";
+import "@violetprotocol/extendable/extensions/extend/ExtendLogic.sol";
+import "@violetprotocol/extendable/storage/ExtendableStorage.sol";
+...
 ```
 
 ## Architecture

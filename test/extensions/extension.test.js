@@ -29,11 +29,11 @@ describe("Extension", function () {
         await caller.deployed();
     })
 
-    it("call function should succeed", async function () {
+    it("call test function should succeed", async function () {
         await expect(caller.callTest(extension.address)).to.emit(extension, 'Test');
     });
 
-    it("call function should fail", async function () {
+    it("call fake function should fail", async function () {
         await expect(caller.callFake(extension.address)).to.be.revertedWith('ExtensionNotImplemented');
     });
 

@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/violetprotocol/extendable/issues"
   },
-  "homepage": "https://github.com/violetprotocol/extendable#readme"
+  "homepage": "https://github.com/violetprotocol/extendable#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.0"
+  }
 }

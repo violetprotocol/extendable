@@ -5,7 +5,9 @@ const {
     EXTEND_LOGIC_INTERFACE, 
     PERMISSIONING_LOGIC_INTERFACE, 
     RETRACT_LOGIC_INTERFACE,
-    REPLACE_LOGIC_INTERFACE
+    REPLACE_LOGIC_INTERFACE,
+    MOCK_CALLER_CONTEXT_INTERFACE,
+    MOCK_DEEP_CALLER_CONTEXT_INTERFACE
 } = require("./utils/constants")
 const web3 = require("web3");
 const chai = require("chai");
@@ -15,14 +17,11 @@ const { expect, assert } = chai;
 
 describe("Extendable", function () {
     let account;
-
     let extendableAddress;
-    let extendLogic;
-    let newExtendLogic;
-    let retractLogic;
-    let newRetractLogic;
-    let replaceLogic;
-    let strictReplaceLogic;
+
+    let extendLogic, newExtendLogic, retractLogic, newRetractLogic, replaceLogic, strictReplaceLogic;
+    
+    let mockCallerContext, mockDeepCallerContext;
 
     before("deploy new", async function () {
         [account] = await ethers.getSigners();
@@ -33,6 +32,9 @@ describe("Extendable", function () {
         const ReplaceLogic = await ethers.getContractFactory("ReplaceLogic");
         const StrictReplaceLogic = await ethers.getContractFactory("StrictReplaceLogic");
 
+        const MockCallerContextLogic = await ethers.getContractFactory("MockCallerContextLogic");
+        const MockDeepCallerContextLogic = await ethers.getContractFactory("MockDeepCallerContextLogic");
+
         const Extendable = await ethers.getContractFactory("Extendable");
 
         extendLogic = await ExtendLogic.deploy();
@@ -42,6 +44,9 @@ describe("Extendable", function () {
         newRetractLogic = await RetractLogic.deploy();
         replaceLogic = await ReplaceLogic.deploy();
         strictReplaceLogic = await StrictReplaceLogic.deploy();
+        mockCallerContext = await MockCallerContextLogic.deploy();
+        mockDeepCallerContext = await MockDeepCallerContextLogic.deploy();
+
         await extendLogic.deployed();
         await newExtendLogic.deployed();
         await permissioningLogic.deployed();
@@ -49,8 +54,10 @@ describe("Extendable", function () {
         await newRetractLogic.deployed();
         await replaceLogic.deployed();
         await strictReplaceLogic.deployed();
+        await mockCallerContext.deployed();
+        await mockDeepCallerContext.deployed();
 
-        const extendable = await Extendable.deploy(extendLogic.address, permissioningLogic.address);
+        const extendable = await Extendable.deploy(extendLogic.address);
         await extendable.deployed();
         extendableAddress = extendable.address;
     })
@@ -271,4 +278,64 @@ describe("Extendable", function () {
             });
         });
     });
+
+    describe("caller context", async () => {
+        it("should extend with caller context", async function () {
+            const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
+            await expect(extendableEx.extend(mockCallerContext.address)).to.not.be.reverted;
+            expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, extendLogic.address, replaceLogic.address, mockCallerContext.address]);
+            expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
+                "interface IExtended {\n",
+                    "function retract(address extension) external;\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function replace(address oldExtension, address newExtension) external;\n",
+                    "function getCurrentCaller() external returns(address);\n",
+                    "function getLastExternalCaller() external returns(address);\n",
+                "}"
+            ));
+        })
+
+        it("should extend with deep caller context", async function () {
+            const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
+            await expect(extendableEx.extend(mockDeepCallerContext.address)).to.not.be.reverted;
+            expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([RETRACT_LOGIC_INTERFACE, PERMISSIONING_LOGIC_INTERFACE, EXTEND_LOGIC_INTERFACE, REPLACE_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE, MOCK_DEEP_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([newRetractLogic.address, permissioningLogic.address, extendLogic.address, replaceLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
+            expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
+                "interface IExtended {\n",
+                    "function retract(address extension) external;\n",
+                    "function init() external;\n",
+                    "function updateOwner(address newOwner) external;\n",
+                    "function getOwner() external view returns(address);\n",
+                    "function extend(address extension) external;\n",
+                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function replace(address oldExtension, address newExtension) external;\n",
+                    "function getCurrentCaller() external returns(address);\n",
+                    "function getLastExternalCaller() external returns(address);\n",
+                    "function getDeepCurrentCaller() external returns(address);\n",
+                    "function getDeepLastExternalCaller() external returns(address);\n",
+                "}"
+            ));
+        })
+
+        it("should record caller stack correctly", async function () {
+            const extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockCallerContextLogic");
+            expect(await extendableCC.callStatic.getCurrentCaller()).to.equal(account.address);
+            expect(await extendableCC.callStatic.getLastExternalCaller()).to.equal(account.address);
+        })
+
+        it("should record deep caller stack correctly", async function () {
+            const extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockDeepCallerContextLogic");
+            expect(await extendableCC.callStatic.getDeepCurrentCaller()).to.equal(extendableAddress);
+            expect(await extendableCC.callStatic.getDeepLastExternalCaller()).to.equal(account.address);
+        })
+    })
 });

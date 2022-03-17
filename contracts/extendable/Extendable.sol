@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "../errors/Errors.sol";
+import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../storage/PermissionStorage.sol";
 import "../extensions/permissioning/PermissioningLogic.sol";
@@ -47,16 +48,11 @@ contract Extendable {
      * To change owner or ownership mode, your contract must be extended with the
      * PermissioningLogic extension, giving it access to permissioning management.
      */
-    constructor(address extendLogic, address permissionLogic) {
-        // initialise contract deployer as `owner` in storage state
-        (bool permSuccess, ) = permissionLogic.delegatecall(abi.encodeWithSignature("init()"));
-
+    constructor(address extendLogic) {
         // extend extendable contract with the first extension: extend, using itself in low-level call
-        // requires extender to be `owner` in reference implementation
         (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
 
         // check that initialisation tasks were successful
-        require(permSuccess, "failed to initialise permissioning");
         require(extendSuccess, "failed to initialise extension");
     }
     
@@ -115,7 +111,6 @@ contract Extendable {
      * returns ExtensionNotImplemented error
      */
     function _fallback() internal virtual {
-        _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getStorage();
 
         // if an extension exists that matches in the functionsig
@@ -139,9 +134,13 @@ contract Extendable {
      * @dev Default fallback function to catch unrecognised selectors.
      *
      * Used in order to perform extension lookups by _fallback().
+     *
+     * Core fallback logic sandwiched between caller context work.
      */
     fallback() external payable virtual {
+        _beforeFallback();
         _fallback();
+        _afterFallback();
     }
     
     /**
@@ -152,13 +151,20 @@ contract Extendable {
     receive() external payable virtual {
         _fallback();
     }
-
     
     /**
      * @dev Virtual hook that is called before _fallback().
-     *
-     * Can be re-implemented by your contract to call certain functionality prior to
-     * the extension lookup.
      */
-    function _beforeFallback() internal virtual {}
+    function _beforeFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getStorage();
+        state.callerStack.push(msg.sender);
+    }
+    
+    /**
+     * @dev Virtual hook that is called after _fallback().
+     */
+    function _afterFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getStorage();
+        state.callerStack.pop();
+    }
 }
