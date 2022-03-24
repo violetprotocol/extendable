@@ -4,10 +4,14 @@ pragma solidity ^0.8.4;
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 
 /**
- * @dev CallerContext contract provides Extensions with proper caller-scoped contexts
+ * @dev CallerContext contract provides Extensions with proper caller-scoped contexts.
+ *      Inherit this contract with your Extension to make use of caller references.
  *
  * `msg.sender` may not behave as developer intends when using within Extensions as many
  * calls may be exchanged between intra-contract extensions which result in a `msg.sender` as self.
+ * Instead of using `msg.sender`, replace it with 
+ *      - `_lastExternalCaller()` for the most recent caller in the call chain that is external to this contract
+ *      - `_lastCaller()` for the most recent caller
  *
  * CallerContext provides a deep callstack to track the caller of the Extension/Extendable contract
  * at any point in the execution cycle.
@@ -22,12 +26,12 @@ contract CallerContext {
      * 
      * This function should be used in place of `msg.sender` where external callers are read.
      */
-    function _lastExternalCaller() internal view returns(address) {
+    function _lastExternalCaller() internal view returns(address, uint256 index) {
         CallerState storage state = CallerContextStorage._getStorage();
         for (uint i = state.callerStack.length - 1; i > 0; i--) {
             address lastSubsequentCaller = state.callerStack[i];
             if (lastSubsequentCaller != address(this)) {
-                return lastSubsequentCaller;
+                return (lastSubsequentCaller, i);
             }
         }
 
