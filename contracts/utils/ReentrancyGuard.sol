@@ -9,7 +9,10 @@ import "./CallerContext.sol";
  *
  * Since Re-entrancy can come in many different forms, Extendables also create new attack vectors.
  *
- * This contract provides guards against total reentrancy to a contract, to a function, and within a contract.
+ * This contract provides guards against 
+ *  -> total reentrancy to a contract;
+ *  -> to a function, and;
+ *  -> within a contract.
  *
  * The three cases are motivated by the following scenarios:
  *      - Extendable contracts now have extensions that are scattered across many contracts that may
