@@ -17,8 +17,6 @@ import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage
  * CallerContext provides a deep callstack to track the caller of the Extension/Extendable contract
  * at any point in the execution cycle.
  *
- * @dev The most recent last caller is always the penultimate item in the callstack as the last item is the
- *      _current_ context which is the current contract
 */
 contract CallerContext {
     /**
