@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
 struct CalledState {
     // Records an chronologically ordered array of function signatures as the current callchain
     bytes4[] calledFuncSigs;

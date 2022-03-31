@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
-
 struct CallerState {
     // Stores a list of callers in the order they are received
     // The current caller context is always the last-most address

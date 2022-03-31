@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "../errors/Errors.sol";
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
