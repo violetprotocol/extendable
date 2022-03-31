@@ -2,15 +2,19 @@
 pragma solidity ^0.8.4;
 
 import "../../extensions/Extension.sol";
-import "../../utils/CallerContext.sol";
 import { IMockCallerContextLogic } from "./MockCallerContextLogic.sol";
 
 interface IMockDeepCallerContextLogic {
+    function getDeepCallerStack() external returns(address[] memory);
     function getDeepCurrentCaller() external returns(address);
     function getDeepLastExternalCaller() external returns(address);
 }
 
-contract MockDeepCallerContextLogic is IMockDeepCallerContextLogic, Extension, CallerContext {
+contract MockDeepCallerContextLogic is IMockDeepCallerContextLogic, Extension {
+    function getDeepCallerStack() override public returns(address[] memory) {
+        return IMockCallerContextLogic(address(this)).getCallerStack();
+    }
+
     function getDeepCurrentCaller() override public returns(address) {
         return IMockCallerContextLogic(address(this)).getCurrentCaller();
     }

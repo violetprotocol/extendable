@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "hardhat/console.sol";
 import "../errors/Errors.sol";
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
@@ -32,7 +33,6 @@ import "../extensions/extend/ExtendLogic.sol";
  *
  *  Requirements:
  *      - ExtendLogic contract must already be deployed
- *      - PermissioningLogic contract must already be deployed
  */
 contract Extendable {
     /**
@@ -49,11 +49,16 @@ contract Extendable {
      * PermissioningLogic extension, giving it access to permissioning management.
      */
     constructor(address extendLogic) {
+        // wrap main constructor logic in pre/post fallback hooks for callstack registration
+        _beforeFallback();
+
         // extend extendable contract with the first extension: extend, using itself in low-level call
         (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
 
         // check that initialisation tasks were successful
         require(extendSuccess, "failed to initialise extension");
+
+        _afterFallback();
     }
     
     /**
@@ -92,6 +97,9 @@ contract Extendable {
             }
         } else {
             // otherwise end execution and return the copied full returndata
+
+            // make sure to call _afterFallback before ending execution
+            _afterFallback();
             assembly {
                 return(out, returndatasize())
             }
@@ -111,8 +119,10 @@ contract Extendable {
      * returns ExtensionNotImplemented error
      */
     function _fallback() internal virtual {
+        _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getStorage();
 
+        bool ok = false;
         // if an extension exists that matches in the functionsig
         if (state.extensionContracts[msg.sig] != address(0x0)) {
             // call it
@@ -120,14 +130,14 @@ contract Extendable {
         } else {                                                 
             // else cycle through all extensions to find it if exists
             // this is not the preferred method for usage and only acts as a fallback
-            bool ok = false;
             for (uint i = 0; i < state.interfaceIds.length; i++) {
                 ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
                 if (ok) break; // exit after first successful execution
             }
-            
-            if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
         }
+
+        if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
+        _afterFallback();
     }
 
     /**
@@ -138,9 +148,7 @@ contract Extendable {
      * Core fallback logic sandwiched between caller context work.
      */
     fallback() external payable virtual {
-        _beforeFallback();
         _fallback();
-        _afterFallback();
     }
     
     /**

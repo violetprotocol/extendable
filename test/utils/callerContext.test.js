@@ -100,12 +100,20 @@ describe("CallerContext", function () {
             const extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockCallerContextLogic");
             expect(await extendableCC.callStatic.getCurrentCaller()).to.equal(account.address);
             expect(await extendableCC.callStatic.getLastExternalCaller()).to.equal(account.address);
+
+            // callerstack should always be empty by the end of an execution, but the call navigates through a stackpush which places
+            // the current caller on the callstack
+            expect(await extendableCC.callStatic.getCallerStack()).to.deep.equal([account.address]);
         })
 
         it("should record deep caller stack correctly", async function () {
-            const extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockDeepCallerContextLogic");
+            let extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockDeepCallerContextLogic");
             expect(await extendableCC.callStatic.getDeepCurrentCaller()).to.equal(extendableAddress);
             expect(await extendableCC.callStatic.getDeepLastExternalCaller()).to.equal(account.address);
+
+            // callerstack should always be empty by the end of an execution, but the call navigates through a stackpush which places
+            // the current caller on the callstack, in this case it calls through the EOA and the contract
+            expect(await extendableCC.callStatic.getDeepCallerStack()).to.deep.equal([account.address, extendableAddress]);
         })
     })
 });

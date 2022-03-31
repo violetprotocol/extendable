@@ -2,14 +2,19 @@
 pragma solidity ^0.8.4;
 
 import "../../extensions/Extension.sol";
-import "../../utils/CallerContext.sol";
 
 interface IMockCallerContextLogic {
+    function getCallerStack() external returns(address[] memory);
     function getCurrentCaller() external returns(address);
     function getLastExternalCaller() external returns(address);
 }
 
-contract MockCallerContextLogic is IMockCallerContextLogic, Extension, CallerContext {
+contract MockCallerContextLogic is IMockCallerContextLogic, Extension {
+    function getCallerStack() override public view returns(address[] memory) {
+        CallerState storage state = CallerContextStorage._getStorage();
+        return state.callerStack;
+    }
+
     function getCurrentCaller() override public view returns(address) {
         return _lastCaller();
     }

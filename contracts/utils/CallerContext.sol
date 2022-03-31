@@ -1,6 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "hardhat/console.sol";
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 
 /**
@@ -15,6 +16,9 @@ import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage
  *
  * CallerContext provides a deep callstack to track the caller of the Extension/Extendable contract
  * at any point in the execution cycle.
+ *
+ * @dev The most recent last caller is always the penultimate item in the callstack as the last item is the
+ *      _current_ context which is the current contract
 */
 contract CallerContext {
     /**
@@ -26,12 +30,13 @@ contract CallerContext {
      * 
      * This function should be used in place of `msg.sender` where external callers are read.
      */
-    function _lastExternalCaller() internal view returns(address, uint256 index) {
+    function _lastExternalCaller() internal view returns(address) {
         CallerState storage state = CallerContextStorage._getStorage();
-        for (uint i = state.callerStack.length - 1; i > 0; i--) {
+
+        for (uint i = state.callerStack.length - 1; i >= 0; i--) {
             address lastSubsequentCaller = state.callerStack[i];
             if (lastSubsequentCaller != address(this)) {
-                return (lastSubsequentCaller, i);
+                return lastSubsequentCaller;
             }
         }
 
@@ -42,9 +47,14 @@ contract CallerContext {
      * @dev Returns the most recent caller of this contract.
      *
      * Last caller may also be the current contract.
+     *
+     * If the call is directly to the contract, without passing an Extendable, return `msg.sender` instead
      */
     function _lastCaller() internal view returns(address) {
         CallerState storage state = CallerContextStorage._getStorage();
-        return state.callerStack[state.callerStack.length -1];
+        if (state.callerStack.length > 0)
+            return state.callerStack[state.callerStack.length - 1];
+        else
+            return msg.sender;
     }
 }

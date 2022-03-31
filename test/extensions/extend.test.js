@@ -31,7 +31,7 @@ describe("ExtendLogic", function () {
         await caller.deployed();
     })
 
-    it("deployment should have initialised permissioning", async function () {
+    it("deployment should have initialised owner", async function () {
         expect(await caller.callStatic.getOwner(permissioningLogic.address)).to.equal(account.address);
     });
 
