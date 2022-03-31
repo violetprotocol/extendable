@@ -42,11 +42,9 @@ contract ReentrancyGuard is CallerContext {
         CalledState storage calledState = ReentrancyStorage._getStorage();
         require(!calledState.hasBeenCalled[msg.sig], "nonReentrant: atomic re-entrancy disallowed");
 
-        calledState.hasBeenCalled[msg.sig] = true;
-        calledState.calledFuncSigs.push(msg.sig);
+        preCall();
         _;
-        calledState.hasBeenCalled[msg.sig] = false;
-        calledState.calledFuncSigs.pop();
+        postCall();
     }
 
     /**
@@ -55,8 +53,12 @@ contract ReentrancyGuard is CallerContext {
      * Only allows intra-reentrancy.
      */
     modifier externalNonReentrant {
-        require(_lastCaller() == address(this), "externalNonReentrant: only intra calls allowed");
+        CallerState storage state = CallerContextStorage._getStorage();
+        require(_lastCaller() == address(this) || state.callerStack.length == 1, "externalNonReentrant: only intra calls allowed");
+
+        preCall();
         _;
+        postCall();
     }
 
     /**
@@ -67,6 +69,21 @@ contract ReentrancyGuard is CallerContext {
     modifier strictNonReentrant {
         CalledState storage calledState = ReentrancyStorage._getStorage();
         require(calledState.calledFuncSigs.length == 0, "strictNonReentrancy: no contract re-entrancy allowed");
+        
+        preCall();
         _;
+        postCall();
+    }
+
+    function preCall() private {
+        CalledState storage calledState = ReentrancyStorage._getStorage();
+        calledState.hasBeenCalled[msg.sig] = true;
+        calledState.calledFuncSigs.push(msg.sig);
+    }
+
+    function postCall() private {
+        CalledState storage calledState = ReentrancyStorage._getStorage();
+        calledState.hasBeenCalled[msg.sig] = false;
+        calledState.calledFuncSigs.pop();
     }
 }
