@@ -75,3 +75,9 @@ contract YourExtension is InternalExtension {}
 ```solidity
 contract YourContract is Internal {}
 ```
+
+Internal functions are now internal to only the Extendable contract and all Extensions it has. Your function must be marked as follows:
+
+`function yourFunction() public _internal {}`
+
+with both `public` and `_internal` modifiers. This is due to the external nature of cross-Extension calls where its visibility must be made public for it to be visible outside of the Extension itself but only visible by other Extensions of the current Extendable contract.
