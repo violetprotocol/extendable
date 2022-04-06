@@ -68,8 +68,8 @@ contract ReentrancyGuard is CallerContext {
      */
     modifier strictNonReentrant {
         CalledState storage calledState = ReentrancyStorage._getStorage();
-        require(calledState.calledFuncSigs.length == 0, "strictNonReentrancy: no contract re-entrancy allowed");
-        
+        require(calledState.calledFunctions.length == 0, "strictNonReentrancy: no contract re-entrancy allowed");
+
         preCall();
         _;
         postCall();
@@ -78,12 +78,12 @@ contract ReentrancyGuard is CallerContext {
     function preCall() private {
         CalledState storage calledState = ReentrancyStorage._getStorage();
         calledState.hasBeenCalled[msg.sig] = true;
-        calledState.calledFuncSigs.push(msg.sig);
+        calledState.calledFunctions.push(msg.sig);
     }
 
     function postCall() private {
         CalledState storage calledState = ReentrancyStorage._getStorage();
         calledState.hasBeenCalled[msg.sig] = false;
-        calledState.calledFuncSigs.pop();
+        calledState.calledFunctions.pop();
     }
 }

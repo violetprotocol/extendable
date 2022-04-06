@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 struct CalledState {
     // Records an chronologically ordered array of function signatures as the current callchain
-    bytes4[] calledFuncSigs;
+    bytes4[] calledFunctions;
     // Stores a mapping of function signatures against whether or not it has been called
     // in the current callchain
     mapping(bytes4 => bool) hasBeenCalled;
