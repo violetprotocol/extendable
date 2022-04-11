@@ -20,8 +20,8 @@ module.exports = {
       url: "http://127.0.0.1:8545",
     },
     rinkeby: {
-      url: `${process.env.NODE_URL}`,
-      accounts: [`0x${process.env.RINKEBY_PRIVATE_KEY}`],
+      url: `${process.env.RINKEBY_NODE_URL}`,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
   },
   tenderly: {

@@ -23,11 +23,27 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
 
     /**
-     * @dev see {IExtendLogic-extend}
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner` or the current contract
     */
-    function extend(address extension) override public virtual {
-        Permissions._onlyOwner();
-        
+    modifier onlyOwnerOrSelf {
+        initialise();
+    
+        address owner = Permissions._getStorage().owner;
+        require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
+        _;
+    }
+
+    /**
+     * @dev see {IExtendLogic-extend}
+     *
+     * Uses PermissioningLogic implementation with `owner` checks.
+     *
+     * Restricts extend to `onlyOwner`.
+     *
+     * If `owner` has not been initialised, assume that this is the initial extend call
+     * during constructor of Extendable and instantiate `owner` as the caller.
+    */
+    function extend(address extension) override public virtual onlyOwnerOrSelf {
         require(extension.code.length > 0, "Extend: address is not a contract");
 
         IERC165 erc165Extension = IERC165(payable(extension));
@@ -93,5 +109,21 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
     function getInterfaceId() override public pure returns(bytes4) {
         return(type(IExtendLogic).interfaceId);
+    }
+
+
+    /**
+     * @dev Sets the owner of the contract to the tx origin if unset
+     *
+     * Used by Extendable during first extend to set deployer as the owner that can
+     * extend the contract
+    */
+    function initialise() internal {
+        RoleState storage state = Permissions._getStorage();
+
+        // Set the owner to the transaction sender if owner has not been initialised
+        if (state.owner == address(0x0)) {
+            state.owner = _lastCaller();
+        }
     }
 }

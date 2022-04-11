@@ -22,20 +22,29 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {Extension-constructor} for constructor
     */
 
+
+    /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwner {
+        address owner = Permissions._getStorage().owner;
+        require(_lastCaller() == owner, "unauthorised");
+        _;
+    }
+
     /**
      * @dev see {IPermissioningLogic-init}
     */
     function init() override public {
         RoleState storage state = Permissions._getStorage();
         require(state.owner == address(0x0), "already initialised"); // make sure owner has yet to be set for delegator
-        state.owner = msg.sender;
+        state.owner = _lastCaller();
     }
 
     /**
      * @dev see {IPermissioningLogic-updateOwner}
     */
-    function updateOwner(address newOwner) override public {
-        Permissions._onlyOwner();
+    function updateOwner(address newOwner) override public onlyOwner {
         RoleState storage state = Permissions._getStorage();
         state.owner = newOwner;
     }
