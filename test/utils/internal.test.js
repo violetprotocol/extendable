@@ -44,11 +44,11 @@ describe("InternalExtension", function () {
 
     describe("extend", () => {
         it("should extend with internal extension", async function () {
-            const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-            await expect(extendableEx.extend(mockInternalExtension.address)).to.not.be.reverted;
-            expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_INTERNAL_EXTENSION_INTERFACE]);
-            expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockInternalExtension.address]);
-            expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
+            const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
+            await expect(extendableExtendLogic.extend(mockInternalExtension.address)).to.not.be.reverted;
+            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_INTERNAL_EXTENSION_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockInternalExtension.address]);
+            expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
@@ -63,13 +63,13 @@ describe("InternalExtension", function () {
 
     describe("internal function call", async () => {
         it("call external function successfully should succeed", async function () {
-            const extendableIn = await utils.getExtendedContractWithInterface(extendableAddress, "MockInternalExtension");
-            await expect(extendableIn.callInternalFunction()).to.not.be.reverted;
+            const extendableInternalExtension = await utils.getExtendedContractWithInterface(extendableAddress, "MockInternalExtension");
+            await expect(extendableInternalExtension.callInternalFunction()).to.not.be.reverted;
         })
 
         it("call internal function directly should fail", async function () {
-            const extendableIn = await utils.getExtendedContractWithInterface(extendableAddress, "MockInternalExtension");
-            await expect(extendableIn.internalFunction()).to.be.revertedWith("external caller not allowed");
+            const extendableInternalExtension = await utils.getExtendedContractWithInterface(extendableAddress, "MockInternalExtension");
+            await expect(extendableInternalExtension.internalFunction()).to.be.revertedWith("external caller not allowed");
         })
     })
 });

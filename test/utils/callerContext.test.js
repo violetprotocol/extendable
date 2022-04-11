@@ -48,11 +48,11 @@ describe("CallerContext", function () {
 
     describe("extend", () => {
         it("should extend with caller context", async function () {
-            const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-            await expect(extendableEx.extend(mockCallerContext.address)).to.not.be.reverted;
-            expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE]);
-            expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address]);
-            expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
+            const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
+            await expect(extendableExtendLogic.extend(mockCallerContext.address)).to.not.be.reverted;
+            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address]);
+            expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
@@ -65,11 +65,11 @@ describe("CallerContext", function () {
         })
 
         it("should extend with deep caller context", async function () {
-            const extendableEx = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-            await expect(extendableEx.extend(mockDeepCallerContext.address)).to.not.be.reverted;
-            expect(await extendableEx.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE, MOCK_DEEP_CALLER_CONTEXT_INTERFACE]);
-            expect(await extendableEx.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
-            expect(await extendableEx.callStatic.getCurrentInterface()).to.equal("".concat(
+            const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
+            await expect(extendableExtendLogic.extend(mockDeepCallerContext.address)).to.not.be.reverted;
+            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE, MOCK_DEEP_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
+            expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
@@ -86,23 +86,23 @@ describe("CallerContext", function () {
 
     describe("caller context", async () => {
         it("should record caller stack correctly", async function () {
-            const extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockCallerContextLogic");
-            expect(await extendableCC.callStatic.getCurrentCaller()).to.equal(account.address);
-            expect(await extendableCC.callStatic.getLastExternalCaller()).to.equal(account.address);
+            const extendableCallerContextLogic = await utils.getExtendedContractWithInterface(extendableAddress, "MockCallerContextLogic");
+            expect(await extendableCallerContextLogic.callStatic.getCurrentCaller()).to.equal(account.address);
+            expect(await extendableCallerContextLogic.callStatic.getLastExternalCaller()).to.equal(account.address);
 
             // callerstack should always be empty by the end of an execution, but the call navigates through a stackpush which places
             // the current caller on the callstack
-            expect(await extendableCC.callStatic.getCallerStack()).to.deep.equal([account.address]);
+            expect(await extendableCallerContextLogic.callStatic.getCallerStack()).to.deep.equal([account.address]);
         })
 
         it("should record deep caller stack correctly", async function () {
-            let extendableCC = await utils.getExtendedContractWithInterface(extendableAddress, "MockDeepCallerContextLogic");
-            expect(await extendableCC.callStatic.getDeepCurrentCaller()).to.equal(extendableAddress);
-            expect(await extendableCC.callStatic.getDeepLastExternalCaller()).to.equal(account.address);
+            let extendableCallerContextLogic = await utils.getExtendedContractWithInterface(extendableAddress, "MockDeepCallerContextLogic");
+            expect(await extendableCallerContextLogic.callStatic.getDeepCurrentCaller()).to.equal(extendableAddress);
+            expect(await extendableCallerContextLogic.callStatic.getDeepLastExternalCaller()).to.equal(account.address);
 
             // callerstack should always be empty by the end of an execution, but the call navigates through a stackpush which places
             // the current caller on the callstack, in this case it calls through the EOA and the contract
-            expect(await extendableCC.callStatic.getDeepCallerStack()).to.deep.equal([account.address, extendableAddress]);
+            expect(await extendableCallerContextLogic.callStatic.getDeepCallerStack()).to.deep.equal([account.address, extendableAddress]);
         })
     })
 });
