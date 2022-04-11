@@ -22,7 +22,7 @@ The CallerContext contract provides two functions:
 * `_lastExternalCaller` which returns a reference to the last caller of the contract that originated outside of this contract
 * `_lastCaller` which returns a reference to the caller of this function, similar to `msg.sender` but indexed through a recorded callchain
 
-The `Extendable` contract itself records the the callchain as functions are called. Calling either of the above functions in your Extensions will provide you the exact caller in the current context.
+The `Extendable` contract itself records the callchain as functions are called. Calling either of the above functions in your Extensions will provide you the exact caller in the current context.
 
 ## Reentrancy Guard
 

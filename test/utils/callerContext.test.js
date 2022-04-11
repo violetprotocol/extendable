@@ -6,7 +6,6 @@ const {
     MOCK_CALLER_CONTEXT_INTERFACE,
     MOCK_DEEP_CALLER_CONTEXT_INTERFACE
 } = require("./constants")
-const web3 = require("web3");
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
@@ -44,17 +43,7 @@ describe("CallerContext", function () {
     })
 
     it("deploy extendable should succeed in initialising", async function () {
-        const extendable = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-        expect(await extendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
-        expect(await extendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
-        expect(await extendable.callStatic.getCurrentInterface()).to.equal("".concat(
-            "interface IExtended {\n",
-            "function extend(address extension) external;\n",
-            "function getCurrentInterface() external view returns(string memory);\n",
-            "function getExtensions() external view returns(bytes4[] memory);\n",
-            "function getExtensionAddresses() external view returns(address[] memory);\n",
-            "}"
-        ));
+        await utils.shouldInitialiseExtendableCorrectly(extendableAddress, extendLogic.address);
     });
 
     describe("extend", () => {

@@ -38,29 +38,8 @@ describe("Re-entrancy Guard", function () {
     })
 
     it("deployed extendable should succeed in initialising", async function () {
-        const internalExtendable = await utils.getExtendedContractWithInterface(extendableInternal.address, "ExtendLogic");
-        expect(await internalExtendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
-        expect(await internalExtendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
-        expect(await internalExtendable.callStatic.getCurrentInterface()).to.equal("".concat(
-            "interface IExtended {\n",
-            "function extend(address extension) external;\n",
-            "function getCurrentInterface() external view returns(string memory);\n",
-            "function getExtensions() external view returns(bytes4[] memory);\n",
-            "function getExtensionAddresses() external view returns(address[] memory);\n",
-            "}"
-        ));
-
-        const externalExtendable = await utils.getExtendedContractWithInterface(extendableExternal.address, "ExtendLogic");
-        expect(await externalExtendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
-        expect(await externalExtendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
-        expect(await externalExtendable.callStatic.getCurrentInterface()).to.equal("".concat(
-            "interface IExtended {\n",
-            "function extend(address extension) external;\n",
-            "function getCurrentInterface() external view returns(string memory);\n",
-            "function getExtensions() external view returns(bytes4[] memory);\n",
-            "function getExtensionAddresses() external view returns(address[] memory);\n",
-            "}"
-        ));
+        await utils.shouldInitialiseExtendableCorrectly(extendableInternal.address, extendLogic.address);
+        await utils.shouldInitialiseExtendableCorrectly(extendableExternal.address, extendLogic.address);
     });
 
     describe("extend", () => {

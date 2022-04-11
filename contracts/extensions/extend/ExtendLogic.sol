@@ -23,7 +23,7 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
 
     /**
-     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner` or the current contract
     */
     modifier onlyOwnerOrSelf {
         initialise();

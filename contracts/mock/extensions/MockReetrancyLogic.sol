@@ -50,8 +50,8 @@ contract MockReentrancyLogic is IMockReentrancyLogic, Extension, ReentrancyGuard
         IMockReentrancyLogic(target).atomic(address(this));
     }
     
-    // callAtomic -> reatomic -> callAtomic -> reatomic -> ...
-    // alternativing recursive callAtomic -> reatomic calls
+    // callRetomic -> reatomic -> callRetomic -> reatomic -> ...
+    // alternating recursive callRetomic -> reatomic calls
     function callReAtomic(address target) public nonReentrant {
         IMockReentrancyLogic(target).reatomic(address(this));
     }

@@ -5,11 +5,8 @@ const {
     EXTEND_LOGIC_INTERFACE, 
     PERMISSIONING_LOGIC_INTERFACE, 
     RETRACT_LOGIC_INTERFACE,
-    REPLACE_LOGIC_INTERFACE,
-    MOCK_CALLER_CONTEXT_INTERFACE,
-    MOCK_DEEP_CALLER_CONTEXT_INTERFACE
+    REPLACE_LOGIC_INTERFACE
 } = require("./utils/constants")
-const web3 = require("web3");
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
@@ -20,8 +17,6 @@ describe("Extendable", function () {
     let extendableAddress;
 
     let extendLogic, newExtendLogic, retractLogic, newRetractLogic, replaceLogic, strictReplaceLogic;
-    
-    let mockCallerContext, mockDeepCallerContext;
 
     before("deploy new", async function () {
         [account] = await ethers.getSigners();
@@ -32,9 +27,6 @@ describe("Extendable", function () {
         const ReplaceLogic = await ethers.getContractFactory("ReplaceLogic");
         const StrictReplaceLogic = await ethers.getContractFactory("StrictReplaceLogic");
 
-        const MockCallerContextLogic = await ethers.getContractFactory("MockCallerContextLogic");
-        const MockDeepCallerContextLogic = await ethers.getContractFactory("MockDeepCallerContextLogic");
-
         const Extendable = await ethers.getContractFactory("Extendable");
 
         extendLogic = await ExtendLogic.deploy();
@@ -44,8 +36,6 @@ describe("Extendable", function () {
         newRetractLogic = await RetractLogic.deploy();
         replaceLogic = await ReplaceLogic.deploy();
         strictReplaceLogic = await StrictReplaceLogic.deploy();
-        mockCallerContext = await MockCallerContextLogic.deploy();
-        mockDeepCallerContext = await MockDeepCallerContextLogic.deploy();
 
         await extendLogic.deployed();
         await newExtendLogic.deployed();
@@ -54,8 +44,6 @@ describe("Extendable", function () {
         await newRetractLogic.deployed();
         await replaceLogic.deployed();
         await strictReplaceLogic.deployed();
-        await mockCallerContext.deployed();
-        await mockDeepCallerContext.deployed();
 
         const extendable = await Extendable.deploy(extendLogic.address);
         await extendable.deployed();
@@ -63,17 +51,7 @@ describe("Extendable", function () {
     })
 
     it("deploy extendable should succeed in initialising", async function () {
-        const extendable = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-        expect(await extendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
-        expect(await extendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
-        expect(await extendable.callStatic.getCurrentInterface()).to.equal("".concat(
-            "interface IExtended {\n",
-            "function extend(address extension) external;\n",
-            "function getCurrentInterface() external view returns(string memory);\n",
-            "function getExtensions() external view returns(bytes4[] memory);\n",
-            "function getExtensionAddresses() external view returns(address[] memory);\n",
-            "}"
-        ));
+        await utils.shouldInitialiseExtendableCorrectly(extendableAddress, extendLogic.address);
     });
 
     describe("extend", () => {
