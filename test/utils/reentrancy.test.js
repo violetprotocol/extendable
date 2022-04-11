@@ -86,7 +86,7 @@ describe("Re-entrancy Guard", function () {
         })
 
         it("should extend external extendable with guarded extension", async function () {
-            const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableExtendLogicternal.address, "ExtendLogic");
+            const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableExternal.address, "ExtendLogic");
             await expect(extendableExtendLogic.extend(reentrancylogic.address)).to.not.be.reverted;
             expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_REENTRANCY_INTERFACE]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, reentrancylogic.address]);
