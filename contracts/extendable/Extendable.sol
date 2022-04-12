@@ -2,6 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "../errors/Errors.sol";
+import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../storage/PermissionStorage.sol";
 import "../extensions/permissioning/PermissioningLogic.sol";
@@ -31,7 +32,6 @@ import "../extensions/extend/ExtendLogic.sol";
  *
  *  Requirements:
  *      - ExtendLogic contract must already be deployed
- *      - PermissioningLogic contract must already be deployed
  */
 contract Extendable {
     /**
@@ -47,17 +47,17 @@ contract Extendable {
      * To change owner or ownership mode, your contract must be extended with the
      * PermissioningLogic extension, giving it access to permissioning management.
      */
-    constructor(address extendLogic, address permissionLogic) {
-        // initialise contract deployer as `owner` in storage state
-        (bool permSuccess, ) = permissionLogic.delegatecall(abi.encodeWithSignature("init()"));
+    constructor(address extendLogic) {
+        // wrap main constructor logic in pre/post fallback hooks for callstack registration
+        _beforeFallback();
 
         // extend extendable contract with the first extension: extend, using itself in low-level call
-        // requires extender to be `owner` in reference implementation
         (bool extendSuccess, ) = extendLogic.delegatecall(abi.encodeWithSignature("extend(address)", extendLogic));
 
         // check that initialisation tasks were successful
-        require(permSuccess, "failed to initialise permissioning");
         require(extendSuccess, "failed to initialise extension");
+
+        _afterFallback();
     }
     
     /**
@@ -96,6 +96,9 @@ contract Extendable {
             }
         } else {
             // otherwise end execution and return the copied full returndata
+
+            // make sure to call _afterFallback before ending execution
+            _afterFallback();
             assembly {
                 return(out, returndatasize())
             }
@@ -118,6 +121,7 @@ contract Extendable {
         _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getStorage();
 
+        bool ok = false;
         // if an extension exists that matches in the functionsig
         if (state.extensionContracts[msg.sig] != address(0x0)) {
             // call it
@@ -125,20 +129,22 @@ contract Extendable {
         } else {                                                 
             // else cycle through all extensions to find it if exists
             // this is not the preferred method for usage and only acts as a fallback
-            bool ok = false;
             for (uint i = 0; i < state.interfaceIds.length; i++) {
                 ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
                 if (ok) break; // exit after first successful execution
             }
-            
-            if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
         }
+
+        if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
+        _afterFallback();
     }
 
     /**
      * @dev Default fallback function to catch unrecognised selectors.
      *
      * Used in order to perform extension lookups by _fallback().
+     *
+     * Core fallback logic sandwiched between caller context work.
      */
     fallback() external payable virtual {
         _fallback();
@@ -152,13 +158,20 @@ contract Extendable {
     receive() external payable virtual {
         _fallback();
     }
-
     
     /**
      * @dev Virtual hook that is called before _fallback().
-     *
-     * Can be re-implemented by your contract to call certain functionality prior to
-     * the extension lookup.
      */
-    function _beforeFallback() internal virtual {}
+    function _beforeFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getStorage();
+        state.callerStack.push(msg.sender);
+    }
+    
+    /**
+     * @dev Virtual hook that is called after _fallback().
+     */
+    function _afterFallback() internal virtual {
+        CallerState storage state = CallerContextStorage._getStorage();
+        state.callerStack.pop();
+    }
 }

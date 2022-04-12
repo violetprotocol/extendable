@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "../Extension.sol";
 import "./IReplaceLogic.sol";
 import "../extend/IExtendLogic.sol";
@@ -19,6 +18,15 @@ contract ReplaceLogic is IReplaceLogic, Extension {
     */
 
     /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwner {
+        address owner = Permissions._getStorage().owner;
+        require(_lastCaller() == owner, "unauthorised");
+        _;
+    }
+
+    /**
      * @dev see {IReplaceLogic-replace} Replaces any old extension with any new extension.
      *
      * Uses RetractLogic to remove old and ExtendLogic to add new.
@@ -26,9 +34,7 @@ contract ReplaceLogic is IReplaceLogic, Extension {
      * If ExtendLogic is being replaced, ensure that the new extension implements IExtendLogic
      * and use low-level calls to extend.
     */
-    function replace(address oldExtension, address newExtension) public override virtual {
-        Permissions._onlyOwner();
-
+    function replace(address oldExtension, address newExtension) public override virtual onlyOwner {
         // Initialise both prior to state change for safety
         IRetractLogic retractLogic = IRetractLogic(payable(address(this)));
         IExtendLogic extendLogic = IExtendLogic(payable(address(this)));

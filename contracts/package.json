@@ -1,7 +1,7 @@
 {
   "name": "@violetprotocol/extendable",
   "description": "Extendable smart contract pattern for Solidity",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "files": [
     "**/*.sol",
     "/build/contracts/*.json",
@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/violetprotocol/extendable/issues"
   },
-  "homepage": "https://github.com/violetprotocol/extendable#readme"
+  "homepage": "https://github.com/violetprotocol/extendable#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.0"
+  }
 }

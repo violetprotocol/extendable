@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "../Extension.sol";
 import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
@@ -13,11 +12,18 @@ contract RetractLogic is IRetractLogic, Extension {
     */
 
     /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwnerOrSelf {
+        address owner = Permissions._getStorage().owner;
+        require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
+        _;
+    }
+
+    /**
      * @dev see {IRetractLogic-retract}
     */
-    function retract(address extension) override public virtual {
-        Permissions._onlyOwner();
-
+    function retract(address extension) override public virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getStorage();
 
         // Search for extension in interfaceIds

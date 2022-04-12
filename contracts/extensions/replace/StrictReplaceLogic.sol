@@ -1,7 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "hardhat/console.sol";
 import "../Extension.sol";
 import "./IReplaceLogic.sol";
 import "../extend/IExtendLogic.sol";
@@ -18,15 +17,22 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
     */
 
     /**
+     * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
+    */
+    modifier onlyOwner {
+        address owner = Permissions._getStorage().owner;
+        require(_lastCaller() == owner, "unauthorised");
+        _;
+    }
+
+    /**
      * @dev see {IReplaceLogic-replace} Replaces an old extension with a new extension that matches the old interface.
      *
      * Uses RetractLogic to remove old and ExtendLogic to add new.
      *
      * Strictly only allows replacement of extensions with new implementations of the same interface.
     */
-    function replace(address oldExtension, address newExtension) public override virtual {
-        Permissions._onlyOwner();
-
+    function replace(address oldExtension, address newExtension) public override virtual onlyOwner {
         require(newExtension.code.length > 0, "Replace: new extend address is not a contract");
 
         IExtension old = IExtension(payable(oldExtension));
@@ -59,10 +65,17 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
         }
     }
 
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
     function getInterfaceId() override public pure returns(bytes4) {
         return (type(IReplaceLogic).interfaceId);
     }
 
+
+    /**
+     * @dev see {IExtension-getInterface}
+    */
     function getInterface() override public pure returns(string memory) {
         return "function replace(address oldExtension, address newExtension) external;\n";
     }

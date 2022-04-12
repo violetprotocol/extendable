@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
+import "../utils/CallerContext.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -22,7 +23,7 @@ import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
  *      contract YourExtension is IYourExtension, Extension {...}
  *
  */
-abstract contract Extension is ERC165Storage, IExtension {
+abstract contract Extension is ERC165Storage, CallerContext, IExtension {
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
