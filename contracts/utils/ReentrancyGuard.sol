@@ -39,7 +39,7 @@ contract ReentrancyGuard is CallerContext {
      * A contract can be re-entered if a different function is called
      */
     modifier nonReentrant {
-        CalledState storage calledState = ReentrancyStorage._getStorage();
+        CalledState storage calledState = ReentrancyStorage._getState();
         require(!calledState.hasBeenCalled[msg.sig], "nonReentrant: atomic re-entrancy disallowed");
 
         preCall();
@@ -53,7 +53,7 @@ contract ReentrancyGuard is CallerContext {
      * Only allows intra-reentrancy.
      */
     modifier externalNonReentrant {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         require(_lastCaller() == address(this) || state.callerStack.length == 1, "externalNonReentrant: only intra calls allowed");
 
         preCall();
@@ -67,7 +67,7 @@ contract ReentrancyGuard is CallerContext {
      * Disallows all entrancy to modified functions in the same contract.
      */
     modifier strictNonReentrant {
-        CalledState storage calledState = ReentrancyStorage._getStorage();
+        CalledState storage calledState = ReentrancyStorage._getState();
         require(calledState.calledFunctions.length == 0, "strictNonReentrancy: no contract re-entrancy allowed");
 
         preCall();
@@ -76,13 +76,13 @@ contract ReentrancyGuard is CallerContext {
     }
 
     function preCall() private {
-        CalledState storage calledState = ReentrancyStorage._getStorage();
+        CalledState storage calledState = ReentrancyStorage._getState();
         calledState.hasBeenCalled[msg.sig] = true;
         calledState.calledFunctions.push(msg.sig);
     }
 
     function postCall() private {
-        CalledState storage calledState = ReentrancyStorage._getStorage();
+        CalledState storage calledState = ReentrancyStorage._getState();
         calledState.hasBeenCalled[msg.sig] = false;
         calledState.calledFunctions.pop();
     }

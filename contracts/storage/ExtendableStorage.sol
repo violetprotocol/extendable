@@ -18,14 +18,14 @@ struct ExtendableState {
 library ExtendableStorage {
     bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:extendable-state");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
-        returns (ExtendableState storage extendableStorage) 
+        returns (ExtendableState storage extendableState) 
     {
         bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
         assembly {
-            extendableStorage.slot := position
+            extendableState.slot := position
         }
     }
 }

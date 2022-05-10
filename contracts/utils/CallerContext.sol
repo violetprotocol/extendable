@@ -28,7 +28,7 @@ contract CallerContext {
      * This function should be used in place of `msg.sender` where external callers are read.
      */
     function _lastExternalCaller() internal view returns(address) {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
 
         for (uint i = state.callerStack.length - 1; i >= 0; i--) {
             address lastSubsequentCaller = state.callerStack[i];
@@ -48,7 +48,7 @@ contract CallerContext {
      * If the call is directly to the contract, without passing an Extendable, return `msg.sender` instead
      */
     function _lastCaller() internal view returns(address) {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         if (state.callerStack.length > 0)
             return state.callerStack[state.callerStack.length - 1];
         else

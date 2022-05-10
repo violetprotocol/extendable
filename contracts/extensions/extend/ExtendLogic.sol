@@ -28,7 +28,7 @@ contract ExtendLogic is IExtendLogic, Extension {
     modifier onlyOwnerOrSelf {
         initialise();
     
-        address owner = Permissions._getStorage().owner;
+        address owner = Permissions._getState().owner;
         require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
         _;
     }
@@ -50,7 +50,7 @@ contract ExtendLogic is IExtendLogic, Extension {
         require(erc165Extension.supportsInterface(bytes4(0x01ffc9a7)), "Extend: extension does not implement eip-165");
 
         IExtension ext = IExtension(payable(extension));
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
         require(state.extensionContracts[ext.getInterfaceId()] == address(0x0), "Extend: extension already exists for interfaceId");
 
         state.interfaceIds.push(ext.getInterfaceId());
@@ -61,7 +61,7 @@ contract ExtendLogic is IExtendLogic, Extension {
      * @dev see {IExtendLogic-getCurrentInterface}
     */
     function getCurrentInterface() override public view returns(string memory fullInterface) {
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
         for (uint i = 0; i < state.interfaceIds.length; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
@@ -76,7 +76,7 @@ contract ExtendLogic is IExtendLogic, Extension {
      * @dev see {IExtendLogic-getExtensions}
     */
     function getExtensions() override public view returns(bytes4[] memory) {
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
         return state.interfaceIds;
     }
 
@@ -84,7 +84,7 @@ contract ExtendLogic is IExtendLogic, Extension {
      * @dev see {IExtendLogic-getExtensionAddresses}
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
         address[] memory addresses = new address[](state.interfaceIds.length);
         
         for (uint i = 0; i < state.interfaceIds.length; i++) {
@@ -119,7 +119,7 @@ contract ExtendLogic is IExtendLogic, Extension {
      * extend the contract
     */
     function initialise() internal {
-        RoleState storage state = Permissions._getStorage();
+        RoleState storage state = Permissions._getState();
 
         // Set the owner to the transaction sender if owner has not been initialised
         if (state.owner == address(0x0)) {

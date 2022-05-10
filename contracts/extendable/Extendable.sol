@@ -119,7 +119,7 @@ contract Extendable {
      */
     function _fallback() internal virtual {
         _beforeFallback();
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
 
         bool ok = false;
         // if an extension exists that matches in the functionsig
@@ -163,7 +163,7 @@ contract Extendable {
      * @dev Virtual hook that is called before _fallback().
      */
     function _beforeFallback() internal virtual {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         state.callerStack.push(msg.sender);
     }
     
@@ -171,7 +171,7 @@ contract Extendable {
      * @dev Virtual hook that is called after _fallback().
      */
     function _afterFallback() internal virtual {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         state.callerStack.pop();
     }
 }
