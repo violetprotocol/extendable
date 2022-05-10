@@ -12,14 +12,14 @@ struct CalledState {
 library ReentrancyStorage {
     bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:reentrancy-guard");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
-        returns (CalledState storage calledStorage) 
+        returns (CalledState storage calledState) 
     {
         bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
         assembly {
-            calledStorage.slot := position
+            calledState.slot := position
         }
     }
 }

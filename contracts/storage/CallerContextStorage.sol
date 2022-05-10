@@ -10,14 +10,14 @@ struct CallerState {
 library CallerContextStorage {
     bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:caller-state");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
-        returns (CallerState storage callerStorage) 
+        returns (CallerState storage callerState) 
     {
         bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
         assembly {
-            callerStorage.slot := position
+            callerState.slot := position
         }
     }
 }

@@ -11,7 +11,7 @@ interface IMockCallerContextLogic {
 
 contract MockCallerContextLogic is IMockCallerContextLogic, Extension {
     function getCallerStack() override public view returns(address[] memory) {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         return state.callerStack;
     }
 

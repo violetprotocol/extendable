@@ -15,7 +15,7 @@ contract RetractLogic is IRetractLogic, Extension {
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
     modifier onlyOwnerOrSelf {
-        address owner = Permissions._getStorage().owner;
+        address owner = Permissions._getState().owner;
         require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
         _;
     }
@@ -24,7 +24,7 @@ contract RetractLogic is IRetractLogic, Extension {
      * @dev see {IRetractLogic-retract}
     */
     function retract(address extension) override public virtual onlyOwnerOrSelf {
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
 
         // Search for extension in interfaceIds
         for (uint i = 0; i < state.interfaceIds.length; i++) {

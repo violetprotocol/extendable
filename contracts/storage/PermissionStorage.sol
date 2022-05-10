@@ -17,14 +17,14 @@ struct RoleState {
 library Permissions {
     bytes32 constant private STORAGE_NAME = keccak256("extendable.framework.v1:permissions-state");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
-        returns (RoleState storage roleStorage) 
+        returns (RoleState storage roleState) 
     {
         bytes32 position = keccak256(abi.encodePacked(address(this), STORAGE_NAME));
         assembly {
-            roleStorage.slot := position
+            roleState.slot := position
         }
     }
 }

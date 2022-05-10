@@ -85,7 +85,7 @@ struct YourState {
 library YourStorage {
     bytes32 constant private STORAGE_NAME = keccak256("your_unique_storage_identifier");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
         returns (YourState storage state) 
@@ -104,7 +104,7 @@ import "./YourStorage.sol";
 
 contract YourExtension is IYourExtension, Extension {
     function readStorage() public view {
-        YourState storage state = YourStorage._getStorage();
+        YourState storage state = YourStorage._getState();
 
         // access properties of state with `state.yourVar`
         // re-assign state properties with `state.yourVar = <value>`
