@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  * Modify this ExtendLogic extension to change the way that your contract can be
  * extended: public extendability; DAO-based extendability; governance-vote-based etc.
 */
-contract ExtendLogic is IExtendLogic, Extension {
+contract ExtendLogic is ExtendExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -42,19 +42,33 @@ contract ExtendLogic is IExtendLogic, Extension {
      *
      * If `owner` has not been initialised, assume that this is the initial extend call
      * during constructor of Extendable and instantiate `owner` as the caller.
+     *
+     * If any single function in the extension has already been extended by another extension,
+     * revert the transaction.
     */
     function extend(address extension) override public virtual onlyOwnerOrSelf {
         require(extension.code.length > 0, "Extend: address is not a contract");
 
         IERC165 erc165Extension = IERC165(payable(extension));
         require(erc165Extension.supportsInterface(bytes4(0x01ffc9a7)), "Extend: extension does not implement eip-165");
+        require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
 
         IExtension ext = IExtension(payable(extension));
         ExtendableState storage state = ExtendableStorage._getState();
-        require(state.extensionContracts[ext.getInterfaceId()] == address(0x0), "Extend: extension already exists for interfaceId");
 
-        state.interfaceIds.push(ext.getInterfaceId());
-        state.extensionContracts[ext.getInterfaceId()] = extension;
+        bytes4[] memory functions = ext.getFunctionSelectors();
+        for (uint256 i = 0; i < functions.length; i++) {
+            require(
+                state.extensionContracts[functions[i]] == address(0x0),
+                string(abi.encodePacked("Extend: function ", functions[i]," is already implemented by another extension"))
+            );
+        }
+
+        bytes4[] memory fullInterfaces = ext.getInterfaceIds();
+        for (uint256 i = 0; i < fullInterfaces.length; i++) { // Set the implementer of the full interfaceId to the extension
+            state.interfaceIds.push(fullInterfaces[i]);
+            state.extensionContracts[fullInterfaces[i]] = extension;
+        }
     }
 
     /**
@@ -93,24 +107,6 @@ contract ExtendLogic is IExtendLogic, Extension {
         }
         return addresses;
     }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function extend(address extension) external;\n"
-                "function getCurrentInterface() external view returns(string memory);\n"
-                "function getExtensions() external view returns(bytes4[] memory);\n"
-                "function getExtensionAddresses() external view returns(address[] memory);\n";
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IExtendLogic).interfaceId);
-    }
-
 
     /**
      * @dev Sets the owner of the contract to the tx origin if unset

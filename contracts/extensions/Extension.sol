@@ -5,6 +5,7 @@ import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import "../utils/CallerContext.sol";
+import "./erc165/IERC165Logic.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -23,14 +24,23 @@ import "../utils/CallerContext.sol";
  *      contract YourExtension is IYourExtension, Extension {...}
  *
  */
-abstract contract Extension is ERC165Storage, CallerContext, IExtension {
+abstract contract Extension is CallerContext, IExtension {
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
     */
     constructor() {
-        _registerInterface(getInterfaceId());
-        _registerInterface(type(IExtension).interfaceId);
+        bytes4[] memory interfaces = getInterfaceIds();
+        for (uint256 i = 0; i < interfaces.length; i++) {
+            IERC165RegistrationLogic(address(this))._registerInterface(interfaces[i]);
+        }
+
+        bytes4[] memory functions = getFunctionSelectors();
+        for (uint256 i = 0; i < functions.length; i++) {
+            IERC165RegistrationLogic(address(this))._registerInterface(functions[i]);
+        }
+
+        IERC165RegistrationLogic(address(this))._registerInterface(type(IExtension).interfaceId);
     }
 
     /**
@@ -60,5 +70,12 @@ abstract contract Extension is ERC165Storage, CallerContext, IExtension {
      *
      * Must be implemented in inherited contract.
     */
-    function getInterfaceId() override public virtual pure returns(bytes4);
+    function getInterfaceIds() override public virtual pure returns(bytes4[] memory);
+
+    /**
+     * @dev Virtual override declaration of getFunctionSelectors() function
+     *
+     * Must be implemented in inherited contract.
+    */
+    function getFunctionSelectors() override public virtual pure returns(bytes4[] memory);
 }

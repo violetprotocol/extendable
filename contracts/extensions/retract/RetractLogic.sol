@@ -6,7 +6,7 @@ import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-contract RetractLogic is IRetractLogic, Extension {
+contract RetractLogic is RetractExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -25,6 +25,15 @@ contract RetractLogic is IRetractLogic, Extension {
     */
     function retract(address extension) override public virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getState();
+
+        IExtension ext = IExtension(extension);
+
+
+        bool isImplemented;
+        for(uint256 i = 0; i < ext.getInterfaceIds().length; i++) {
+            
+        }
+        require(isImplemented, "Retract: interfaceId is not implemented by any extension");
 
         // Search for extension in interfaceIds
         for (uint i = 0; i < state.interfaceIds.length; i++) {
@@ -48,16 +57,30 @@ contract RetractLogic is IRetractLogic, Extension {
     }
 
     /**
-     * @dev see {IExtension-getInterfaceId}
+     * @dev see {IRetractLogic-retract}
     */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return (type(IRetractLogic).interfaceId);
-    }
+    function retractImplementor(bytes4 interfaceId) override public virtual onlyOwnerOrSelf {
+        ExtendableState storage state = ExtendableStorage._getState();
+        address implementor = state.extensionContracts[interfaceId];
+        
+        require(implementor != address(0x0), "Retract: interfaceId is not implemented by any extension");
+    
+        IExtension ext = IExtension(implementor);
+        bytes4[] memory functionSelectors = ext.getFunctionSelectors();
 
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return "function retract(address extension) external;\n";
+        // Remove current contract as implementor of function selectors
+        for (uint i = 0; i < functionSelectors.length; i++) {
+            if (state.extensionContracts[functionSelectors[i]] == implementor) 
+                delete state.extensionContracts[functionSelectors[i]];
+        }
+
+        // Search and delete interfaceId
+        for (uint i = 0; i < state.interfaceIds.length; i++) {
+            if (state.interfaceIds[i] == interfaceId) {
+                // Swap interfaceId with final item and pop from array for constant time array removal
+                state.interfaceIds[i] = state.interfaceIds[state.interfaceIds.length - 1];
+                state.interfaceIds.pop();
+            }
+        }
     }
 }

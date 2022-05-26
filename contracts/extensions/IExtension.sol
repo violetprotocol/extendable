@@ -25,7 +25,7 @@ interface IExtension {
     function getInterface() external pure returns(string memory);
 
     /**
-     * @dev Returns the interfaceId of current custom Extension interface
+     * @dev Returns the full interfaceIds of current custom Extension interface implementor
      * 
      * Provides a simple abstraction from the developer for any custom Extension to 
      * be EIP-165 compliant out-of-the-box simply by implementing this function.
@@ -33,5 +33,13 @@ interface IExtension {
      * Excludes any functions either already described by other interface definitions
      * that are not developed on top of this backbone i.e. EIP-165, IExtension
     */
-    function getInterfaceId() external pure returns(bytes4);
+    function getInterfaceIds() external pure returns(bytes4[] memory);
+
+    /**
+     * @dev Returns the function selectors of current custom Extension interface implementor
+     * 
+     * Provides a more granular introspection routine into an Extension, returning the function
+     * selectors (bytes4) for all functions implemented by the Extension
+    */
+    function getFunctionSelectors() external pure returns(bytes4[] memory);
 }
