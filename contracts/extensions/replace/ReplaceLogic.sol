@@ -54,7 +54,7 @@ contract ReplaceLogic is IReplaceLogic, Extension {
                 IExtension old = IExtension(payable(oldExtension));
                 IExtension newEx = IExtension(payable(newExtension));
 
-                // upgrade this contract with modified equality below to enforce a specific new ExtendLogic interface
+                // @dev: upgrade this contract with modified equality below to enforce a specific new ExtendLogic interface
                 require(newEx.getInterfaceId() == old.getInterfaceId(), "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces");
                 
                 // use raw delegate call to re-extend the extension because we have just removed the Extend function

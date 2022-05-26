@@ -14,7 +14,7 @@ import "../errors/Errors.sol";
  *
  *  Base contract for Internal Extensions in the Extendable Framework
  *  
- *  Internal Extensions are used to house common functions that are used by other contract functions.
+ *  Internal Extensions are used to house common functions that are used by other contract extensions.
  *  This is used to make internal functions usable across all your extensions without exposing it
  *  to the external world.
  *
