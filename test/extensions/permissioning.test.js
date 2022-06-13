@@ -29,7 +29,12 @@ describe("PermissioningLogic", function () {
         expect(await logic.callStatic.getOwner()).to.equal(account2.address);
     });
 
-    it("update owner should fail", async function () {
+    it("update owner with the zero address should fail", async function () {
+        await expect(logic.connect(account2).updateOwner(ethers.constants.AddressZero)).to.be.revertedWith("new owner cannot be the zero address");
+        expect(await logic.callStatic.getOwner()).to.equal(account2.address);
+    });
+
+    it("update owner when unauthorized should fail", async function () {
         await expect(logic.updateOwner(account.address)).to.be.revertedWith("unauthorised");
         expect(await logic.callStatic.getOwner()).to.equal(account2.address);
     });

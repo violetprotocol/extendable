@@ -45,6 +45,7 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {IPermissioningLogic-updateOwner}
     */
     function updateOwner(address newOwner) override public onlyOwner {
+        require(newOwner != address(0x0), "new owner cannot be the zero address");
         RoleState storage state = Permissions._getState();
         state.owner = newOwner;
     }
