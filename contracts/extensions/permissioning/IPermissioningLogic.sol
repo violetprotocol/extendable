@@ -14,12 +14,21 @@ interface IPermissioningLogic {
     function init() external;
 
     /**
-     * @dev Updates the `owner` to `newOwner`
+     * @notice Updates the `owner` to `newOwner`
     */
     function updateOwner(address newOwner) external;
 
     /**
-     * @dev Returns the current `owner`
+     * @notice Give up ownership of the contract.
+     * Proceed with extreme caution as this action is irreversible!!
+     *
+     * Requirements:
+     * - can only be called by the current `owner`
+    */
+    function renounceOwnership() external;
+
+    /**
+     * @notice Returns the current `owner`
     */
     function getOwner() external view returns(address);
 }
