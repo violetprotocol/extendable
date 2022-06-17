@@ -18,6 +18,8 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
  * modifier replacement. Can be wrapped in a modifier if preferred.
 */
 contract PermissioningLogic is IPermissioningLogic, Extension {
+    address constant NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -45,8 +47,17 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {IPermissioningLogic-updateOwner}
     */
     function updateOwner(address newOwner) override public onlyOwner {
+        require(newOwner != address(0x0), "new owner cannot be the zero address");
         RoleState storage state = Permissions._getState();
         state.owner = newOwner;
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-renounceOwnership}
+    */
+    function renounceOwnership() override public onlyOwner {
+        RoleState storage state = Permissions._getStorage();
+        state.owner = NULL_ADDRESS;
     }
 
     /**
@@ -70,6 +81,7 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
     function getInterface() override public pure returns(string memory) {
         return  "function init() external;\n"
                 "function updateOwner(address newOwner) external;\n"
+                "function renounceOwnership() external;\n"
                 "function getOwner() external view returns(address);\n";
     }
 }
