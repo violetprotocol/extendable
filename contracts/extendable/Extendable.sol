@@ -47,7 +47,7 @@ contract Extendable {
      * To change owner or ownership mode, your contract must be extended with the
      * PermissioningLogic extension, giving it access to permissioning management.
      */
-    constructor(address extendLogic) {
+    constructor(address extendLogic, address) {
         // wrap main constructor logic in pre/post fallback hooks for callstack registration
         _beforeFallback();
 

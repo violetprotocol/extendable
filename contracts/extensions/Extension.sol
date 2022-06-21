@@ -3,9 +3,8 @@ pragma solidity ^0.8.4;
 
 import "./IExtension.sol";
 import "../errors/Errors.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165Storage.sol";
 import "../utils/CallerContext.sol";
-import "./erc165/IERC165Logic.sol";
+import "../erc165/IERC165Logic.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -14,7 +13,7 @@ import "./erc165/IERC165Logic.sol";
  *  \ \_____\/\_\/\_\ \ \_\ \ \_____\ \_\\"\_\ \____-\ \_\ \_\ \_____\ \_____\ \_____\
  *   \/_____/\/_/\/_/  \/_/  \/_____/\/_/ \/_/\/____/ \/_/\/_/\/_____/\/_____/\/_____/
  *
- *  Base contract for all Extensions in the Extendable Framework
+ *  Base contract for Extensions in the Extendable Framework
  *  
  *  Inherit and implement this contract to create Extension contracts!
  *
@@ -24,7 +23,7 @@ import "./erc165/IERC165Logic.sol";
  *      contract YourExtension is IYourExtension, Extension {...}
  *
  */
-abstract contract Extension is CallerContext, IExtension {
+abstract contract Extension is CallerContext, IExtension, IERC165 {
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
@@ -32,15 +31,40 @@ abstract contract Extension is CallerContext, IExtension {
     constructor() {
         bytes4[] memory interfaces = getInterfaceIds();
         for (uint256 i = 0; i < interfaces.length; i++) {
-            IERC165RegistrationLogic(address(this))._registerInterface(interfaces[i]);
+            _registerInterface(interfaces[i]);
         }
 
         bytes4[] memory functions = getFunctionSelectors();
         for (uint256 i = 0; i < functions.length; i++) {
-            IERC165RegistrationLogic(address(this))._registerInterface(functions[i]);
+            _registerInterface(functions[i]);
         }
 
-        IERC165RegistrationLogic(address(this))._registerInterface(type(IExtension).interfaceId);
+        _registerInterface(type(IExtension).interfaceId);
+    }
+
+    function supportsInterface(bytes4 interfaceId) override public virtual returns (bool) {
+        address ERC165Logic = address(0x1333333333333333333333333333333333333337);
+        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
+
+        if (success) return abi.decode(result, (bool));
+        else {
+            assembly {
+                revert(result, returndatasize())
+            }
+        }
+    }
+
+    function _registerInterface(bytes4 interfaceId) internal virtual {
+        require(interfaceId != 0xffffffff, "ERC165: invalid interface id");
+
+        address ERC165Logic = address(0x1333333333333333333333333333333333333337);
+        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
+
+        if (!success) {
+            assembly {
+                revert(result, returndatasize())
+            }
+        }
     }
 
     /**

@@ -243,13 +243,45 @@ contract MockReentrancyLogic is IMockReentrancyLogic, Extension, ReentrancyGuard
      *  another has been called in the same callstack by any source
      */
 
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IMockReentrancyLogic).interfaceId);
+    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+        interfaces[0] = type(IMockReentrancyLogic).interfaceId;
     }
     
     // very weird, separating this string on separate lines causes hardhat to slow down to a halt and 
     // yarn aborts fatally, so this needs to be in a single line until hardhat fixes
     function getInterface() override public pure returns(string memory) {
         return  "function atomic(address target) external;\nfunction reatomic(address target) external;\nfunction singleAtomic() external;\nfunction singleReatomic(address target) external;\nfunction singleAtomicIntra(address target) external;\nfunction singleAtomicStrict(address target) external;\nfunction doubleReatomic(address target) external;\nfunction doubleAtomicIntra(address target) external;\nfunction doubleAtomicStrict(address target) external;\nfunction intra(address target) external;\nfunction reIntra(address target) external;\nfunction singleIntra() external;\nfunction singleReIntra(address target) external;\nfunction singleIntraAtomic(address target) external;\nfunction singleIntraStrict(address target) external;\nfunction doubleReIntra(address target) external;\nfunction doubleIntraAtomic(address target) external;\nfunction doubleIntraStrict(address target) external;\nfunction strict(address target) external;\nfunction reStrict(address target) external;\nfunction singleStrict() external;\nfunction singleReStrict(address target) external;\nfunction singleStrictAtomic(address target) external;\nfunction singleStrictIntra(address target) external;\nfunction doubleReStrict(address target) external;\nfunction doubleStrictAtomic(address target) external;\nfunction doubleStrictIntra(address target) external;\n";
+    }
+
+    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors[0] = IMockReentrancyLogic.atomic.selector;
+        selectors[1] = IMockReentrancyLogic.reatomic.selector;
+        selectors[2] = IMockReentrancyLogic.singleAtomic.selector;
+        selectors[3] = IMockReentrancyLogic.singleReatomic.selector;
+        selectors[4] = IMockReentrancyLogic.singleAtomicIntra.selector;
+        selectors[5] = IMockReentrancyLogic.singleAtomicStrict.selector;
+        selectors[6] = IMockReentrancyLogic.doubleReatomic.selector;
+        selectors[7] = IMockReentrancyLogic.doubleAtomicIntra.selector;
+        selectors[8] = IMockReentrancyLogic.doubleAtomicStrict.selector;
+
+        selectors[9] = IMockReentrancyLogic.intra.selector;
+        selectors[10] = IMockReentrancyLogic.reIntra.selector;
+        selectors[11] = IMockReentrancyLogic.singleIntra.selector;
+        selectors[12] = IMockReentrancyLogic.singleReIntra.selector;
+        selectors[13] = IMockReentrancyLogic.singleIntraAtomic.selector;
+        selectors[14] = IMockReentrancyLogic.singleIntraStrict.selector;
+        selectors[15] = IMockReentrancyLogic.doubleReIntra.selector;
+        selectors[16] = IMockReentrancyLogic.doubleIntraAtomic.selector;
+        selectors[17] = IMockReentrancyLogic.doubleIntraStrict.selector;
+
+        selectors[18] = IMockReentrancyLogic.strict.selector;
+        selectors[19] = IMockReentrancyLogic.reStrict.selector;
+        selectors[20] = IMockReentrancyLogic.singleStrict.selector;
+        selectors[21] = IMockReentrancyLogic.singleReStrict.selector;
+        selectors[22] = IMockReentrancyLogic.singleStrictAtomic.selector;
+        selectors[23] = IMockReentrancyLogic.singleStrictIntra.selector;
+        selectors[24] = IMockReentrancyLogic.doubleReStrict.selector;
+        selectors[25] = IMockReentrancyLogic.doubleStrictAtomic.selector;
+        selectors[26] = IMockReentrancyLogic.doubleStrictIntra.selector;
     }
 }

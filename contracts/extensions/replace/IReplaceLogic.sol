@@ -1,6 +1,8 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+import "../Extension.sol";
+
 /**
  * @dev Interface for ReplaceLogic extension
 */
@@ -25,4 +27,27 @@ interface IReplaceLogic {
      * - `newExtension` must be a contract that implements IExtension
     */
     function replace(address oldExtension, address newExtension) external;
+}
+
+abstract contract ReplaceExtension is IReplaceLogic, Extension {
+    /**
+     * @dev see {IExtension-getInterfaceId}
+    */
+    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+        interfaces[0] = type(IReplaceLogic).interfaceId;
+    }
+
+    /**
+     * @dev see {IExtension-getInterface}
+    */
+    function getInterface() override public pure returns(string memory) {
+        return  "function replace(address oldExtension, address newExtension) external;\n";
+    }
+
+    /**
+     * @dev see {IExtension-getFunctionSelectors}
+    */
+    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors[0] = IReplaceLogic.replace.selector;
+    }
 }

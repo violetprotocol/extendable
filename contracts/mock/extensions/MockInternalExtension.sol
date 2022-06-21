@@ -17,12 +17,17 @@ contract MockInternalExtension is IMockInternalExtension, InternalExtension {
         return;
     }
 
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IMockInternalExtension).interfaceId);
+    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+        interfaces[0] = type(IMockInternalExtension).interfaceId;
     }
     
     function getInterface() override public pure returns(string memory) {
         return  "function callInternalFunction() external;\n"
                 "function internalFunction() external;\n";
+    }
+
+    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors[0] = IMockInternalExtension.callInternalFunction.selector;
+        selectors[1] = IMockInternalExtension.internalFunction.selector;
     }
 }

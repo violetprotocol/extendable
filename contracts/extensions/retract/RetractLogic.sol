@@ -28,13 +28,6 @@ contract RetractLogic is RetractExtension {
 
         IExtension ext = IExtension(extension);
 
-
-        bool isImplemented;
-        for(uint256 i = 0; i < ext.getInterfaceIds().length; i++) {
-            
-        }
-        require(isImplemented, "Retract: interfaceId is not implemented by any extension");
-
         // Search for extension in interfaceIds
         for (uint i = 0; i < state.interfaceIds.length; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
@@ -43,11 +36,7 @@ contract RetractLogic is RetractExtension {
             // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
                 // Remove from mapping
-                delete state.extensionContracts[interfaceId];
-
-                // Swap interfaceId with final item and pop from array for constant time array removal
-                state.interfaceIds[i] = state.interfaceIds[state.interfaceIds.length - 1];
-                state.interfaceIds.pop();
+                retractImplementor(interfaceId);
 
                 return;
             }
@@ -57,7 +46,7 @@ contract RetractLogic is RetractExtension {
     }
 
     /**
-     * @dev see {IRetractLogic-retract}
+     * @dev see {IRetractLogic-retractImplementor}
     */
     function retractImplementor(bytes4 interfaceId) override public virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getState();

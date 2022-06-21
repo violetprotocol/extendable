@@ -15,7 +15,12 @@ contract MockNewReplaceLogic is IMockNewReplaceLogic, Extension {
         return  "function replace(address oldExtension, address newExtension) external;\n"
                 "function replaceWith(address oldExtension, address newExtension) external;\n";
     }
-    function getInterfaceId() override public pure returns(bytes4) {
-        return type(IMockNewReplaceLogic).interfaceId;
+    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+        interfaces[0] = type(IMockNewReplaceLogic).interfaceId;
+    }
+
+    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors[0] = IMockNewReplaceLogic.replace.selector;
+        selectors[1] = IMockNewReplaceLogic.replaceWith.selector;
     }
 }

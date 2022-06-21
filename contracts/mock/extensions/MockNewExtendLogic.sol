@@ -30,7 +30,15 @@ contract MockNewExtendLogic is IMockNewExtendLogic, Extension {
                 "function randomNewFunction() external;\n";
     }
     
-    function getInterfaceId() override public pure returns(bytes4) {
-        return type(IMockNewExtendLogic).interfaceId;
+    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+        interfaces[0] = type(IMockNewExtendLogic).interfaceId;
+    }
+
+    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors[0] = IMockNewExtendLogic.extend.selector;
+        selectors[1] = IMockNewExtendLogic.getCurrentInterface.selector;
+        selectors[2] = IMockNewExtendLogic.getExtensions.selector;
+        selectors[3] = IMockNewExtendLogic.getExtensionAddresses.selector;
+        selectors[4] = IMockNewExtendLogic.randomNewFunction.selector;
     }
 }

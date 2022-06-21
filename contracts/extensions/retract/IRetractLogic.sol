@@ -20,6 +20,7 @@ interface IRetractLogic {
      * @dev Removes an extension from your Extendable contract that implements `interfaceId`
      *
      * The extension is unmarked as the implementor of the function selectors that it extends.
+     * The extension is unmarked as the implementor of the interfaces it implements as an extension.
      *
      * Requirements:
      * - `interfaceId` must be implemented by an attached extension

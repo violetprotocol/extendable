@@ -5,7 +5,6 @@ import "../Extension.sol";
 import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 
 /**
  * @dev Reference implementation for ExtendLogic which defines the logic to extend
@@ -50,8 +49,12 @@ contract ExtendLogic is ExtendExtension {
         require(extension.code.length > 0, "Extend: address is not a contract");
 
         IERC165 erc165Extension = IERC165(payable(extension));
-        require(erc165Extension.supportsInterface(bytes4(0x01ffc9a7)), "Extend: extension does not implement eip-165");
-        require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
+        try erc165Extension.supportsInterface(bytes4(0x01ffc9a7)) returns(bool erc165supported) {
+            require(erc165supported, "Extend: extension does not implement eip-165");
+            require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
+        } catch (bytes memory) {
+            revert("Extend: extension does not implement eip-165");
+        }
 
         IExtension ext = IExtension(payable(extension));
         ExtendableState storage state = ExtendableStorage._getState();
