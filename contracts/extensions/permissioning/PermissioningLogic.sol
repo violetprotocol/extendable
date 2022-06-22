@@ -56,7 +56,7 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {IPermissioningLogic-renounceOwnership}
     */
     function renounceOwnership() override public onlyOwner {
-        RoleState storage state = Permissions._getStorage();
+        RoleState storage state = Permissions._getState();
         state.owner = NULL_ADDRESS;
     }
 
