@@ -27,7 +27,8 @@ contract RetractLogic is IRetractLogic, Extension {
         ExtendableState storage state = ExtendableStorage._getState();
 
         // Search for extension in interfaceIds
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
+        uint interfaceIdsLength = state.interfaceIds.length;
+        for (uint i = 0; i < interfaceIdsLength; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
             address currentExtension = state.extensionContracts[interfaceId];
 
@@ -37,7 +38,7 @@ contract RetractLogic is IRetractLogic, Extension {
                 delete state.extensionContracts[interfaceId];
 
                 // Swap interfaceId with final item and pop from array for constant time array removal
-                state.interfaceIds[i] = state.interfaceIds[state.interfaceIds.length - 1];
+                state.interfaceIds[i] = state.interfaceIds[interfaceIdsLength - 1];
                 state.interfaceIds.pop();
 
                 return;

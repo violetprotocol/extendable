@@ -62,7 +62,9 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
     function getCurrentInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
+
+        uint interfaceIdsLength = state.interfaceIds.length;
+        for (uint i = 0; i < interfaceIdsLength; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
             fullInterface = string(abi.encodePacked(fullInterface, logic.getInterface()));
@@ -85,9 +87,11 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        address[] memory addresses = new address[](state.interfaceIds.length);
-        
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
+        uint interfaceIdsLength = state.interfaceIds.length;
+
+        address[] memory addresses = new address[](interfaceIdsLength);
+
+        for (uint i = 0; i < interfaceIdsLength; i++) {
             bytes4 interfaceId = state.interfaceIds[i];
             addresses[i] = state.extensionContracts[interfaceId];
         }
