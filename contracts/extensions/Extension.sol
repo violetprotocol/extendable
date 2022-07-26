@@ -29,7 +29,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
      *      https://eips.ethereum.org/EIPS/eip-165
     */
     constructor() {
-        bytes4[] memory interfaces = getInterfaceIds();
+        bytes4[] memory interfaces = getImplementedInterfaces();
         for (uint256 i = 0; i < interfaces.length; i++) {
             _registerInterface(interfaces[i]);
         }
@@ -43,7 +43,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
     }
 
     function supportsInterface(bytes4 interfaceId) override public virtual returns (bool) {
-        address ERC165Logic = address(0x1333333333333333333333333333333333333337);
+        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
         if (success) return abi.decode(result, (bool));
@@ -55,9 +55,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
     }
 
     function _registerInterface(bytes4 interfaceId) internal virtual {
-        require(interfaceId != 0xffffffff, "ERC165: invalid interface id");
-
-        address ERC165Logic = address(0x1333333333333333333333333333333333333337);
+        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
         if (!success) {
@@ -90,16 +88,16 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
     }
 
     /**
-     * @dev Virtual override declaration of getInterfaceId() function
-     *
-     * Must be implemented in inherited contract.
-    */
-    function getInterfaceIds() override public virtual pure returns(bytes4[] memory);
-
-    /**
-     * @dev Virtual override declaration of getFunctionSelectors() function
+     * @dev Virtual override declaration of getFunctionSelectors() function to silence compiler
      *
      * Must be implemented in inherited contract.
     */
     function getFunctionSelectors() override public virtual pure returns(bytes4[] memory);
+
+    /**
+     * @dev Virtual override declaration of getInterfaceId() function to silence compiler
+     *
+     * Must be implemented in inherited contract.
+    */
+    function getImplementedInterfaces() override public virtual pure returns(bytes4[] memory);
 }

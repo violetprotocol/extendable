@@ -129,8 +129,8 @@ contract Extendable {
         } else {                                                 
             // else cycle through all extensions to find it if exists
             // this is not the preferred method for usage and only acts as a fallback
-            for (uint i = 0; i < state.interfaceIds.length; i++) {
-                ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
+            for (uint i = 0; i < state.implementedInterfaces.length; i++) {
+                ok = _delegate(state.extensionContracts[state.implementedInterfaces[i]]);
                 if (ok) break; // exit after first successful execution
             }
         }

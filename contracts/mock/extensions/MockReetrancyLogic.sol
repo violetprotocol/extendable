@@ -243,7 +243,7 @@ contract MockReentrancyLogic is IMockReentrancyLogic, Extension, ReentrancyGuard
      *  another has been called in the same callstack by any source
      */
 
-    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
         interfaces[0] = type(IMockReentrancyLogic).interfaceId;
     }
     

@@ -17,7 +17,7 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
  * to only `owner`. Uses a common function from the storage library `_onlyOwner()` as a
  * modifier replacement. Can be wrapped in a modifier if preferred.
 */
-contract PermissioningLogic is IPermissioningLogic, Extension {
+contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -55,21 +55,5 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
     function getOwner() override public view returns(address) {
         RoleState storage state = Permissions._getState();
         return(state.owner);
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IPermissioningLogic).interfaceId);
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function init() external;\n"
-                "function updateOwner(address newOwner) external;\n"
-                "function getOwner() external view returns(address);\n";
     }
 }

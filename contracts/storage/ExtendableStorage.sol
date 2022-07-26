@@ -6,7 +6,7 @@ pragma solidity ^0.8.4;
  */
 struct ExtendableState {
     // Array of full interfaceIds extended by the Extendable contract instance
-    bytes4[] interfaceIds;
+    bytes4[] implementedInterfaces;
 
     // Array of full interfaceIds extended by the Extendable contract instance
     mapping (bytes4 => bytes4[]) functionSelectorsByInterfaceId;

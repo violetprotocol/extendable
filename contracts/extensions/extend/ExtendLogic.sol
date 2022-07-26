@@ -67,9 +67,9 @@ contract ExtendLogic is ExtendExtension {
             );
         }
 
-        bytes4[] memory fullInterfaces = ext.getInterfaceIds();
+        bytes4[] memory fullInterfaces = ext.getImplementedInterfaces();
         for (uint256 i = 0; i < fullInterfaces.length; i++) { // Set the implementer of the full interfaceId to the extension
-            state.interfaceIds.push(fullInterfaces[i]);
+            state.implementedInterfaces.push(fullInterfaces[i]);
             state.extensionContracts[fullInterfaces[i]] = extension;
         }
     }
@@ -79,8 +79,8 @@ contract ExtendLogic is ExtendExtension {
     */
     function getCurrentInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        for (uint i = 0; i < state.implementedInterfaces.length; i++) {
+            bytes4 interfaceId = state.implementedInterfaces[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
             fullInterface = string(abi.encodePacked(fullInterface, logic.getInterface()));
         }
@@ -94,7 +94,7 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensions() override public view returns(bytes4[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        return state.interfaceIds;
+        return state.implementedInterfaces;
     }
 
     /**
@@ -102,10 +102,10 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        address[] memory addresses = new address[](state.interfaceIds.length);
+        address[] memory addresses = new address[](state.implementedInterfaces.length);
         
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        for (uint i = 0; i < state.implementedInterfaces.length; i++) {
+            bytes4 interfaceId = state.implementedInterfaces[i];
             addresses[i] = state.extensionContracts[interfaceId];
         }
         return addresses;

@@ -19,20 +19,20 @@ interface IRetractLogic {
     /**
      * @dev Removes an extension from your Extendable contract that implements `interfaceId`
      *
-     * The extension is unmarked as the implementor of the function selectors that it extends.
-     * The extension is unmarked as the implementor of the interfaces it implements as an extension.
+     * The extension that implements `interfaceId` is found and unmarked as the implementor of
+     * `interfaceId` and is also removed of all function selectors that contribute to its implementation
      *
      * Requirements:
      * - `interfaceId` must be implemented by an attached extension
     */
-    function retractImplementor(bytes4 interfaceId) external;
+    function retractImplementionOf(bytes4 interfaceId) external;
 }
 
 abstract contract RetractExtension is IRetractLogic, Extension {
     /**
-     * @dev see {IExtension-getInterfaceId}
+     * @dev see {IExtension-getImplementedInterfaces}
     */
-    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
         interfaces[0] = type(IRetractLogic).interfaceId;
     }
 
@@ -41,7 +41,7 @@ abstract contract RetractExtension is IRetractLogic, Extension {
     */
     function getInterface() override public pure returns(string memory) {
         return  "function retract(address extension) external;\n"
-                "function retractImplementor(bytes4 interfaceId) external;\n";
+                "function retractImplementionOf(bytes4 interfaceId) external;\n";
     }
 
     /**
@@ -49,6 +49,6 @@ abstract contract RetractExtension is IRetractLogic, Extension {
     */
     function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
         selectors[0] = IRetractLogic.retract.selector;
-        selectors[1] = IRetractLogic.retractImplementor.selector;
+        selectors[1] = IRetractLogic.retractImplementionOf.selector;
     }
 }

@@ -63,7 +63,7 @@ abstract contract ExtendExtension is IExtendLogic, Extension {
     /**
      * @dev see {IExtension-getInterfaceId}
     */
-    function getInterfaceIds() override public pure returns(bytes4[] memory interfaces) {
+    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
         interfaces[0] = type(IExtendLogic).interfaceId;
     }
 

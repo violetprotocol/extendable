@@ -24,7 +24,7 @@ contract ERC165Caller {
     }
 
     function callRegisterInterface(bytes4 interfaceId) public {
-        (bool success, ) = address(_erc165Logic).delegatecall(abi.encodeWithSignature("_registerInterface(bytes4)", interfaceId));
+        (bool success, ) = address(_erc165Logic).delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
         Revert.require(success);
     }
 

@@ -29,14 +29,15 @@ contract RetractLogic is RetractExtension {
         IExtension ext = IExtension(extension);
 
         // Search for extension in interfaceIds
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        uint256 numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = state.implementedInterfaces[i];
             address currentExtension = state.extensionContracts[interfaceId];
 
             // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
                 // Remove from mapping
-                retractImplementor(interfaceId);
+                retractImplementionOf(interfaceId);
 
                 return;
             }
@@ -46,9 +47,9 @@ contract RetractLogic is RetractExtension {
     }
 
     /**
-     * @dev see {IRetractLogic-retractImplementor}
+     * @dev see {IRetractLogic-retractImplementionOf}
     */
-    function retractImplementor(bytes4 interfaceId) override public virtual onlyOwnerOrSelf {
+    function retractImplementionOf(bytes4 interfaceId) override public virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getState();
         address implementor = state.extensionContracts[interfaceId];
         
@@ -58,17 +59,19 @@ contract RetractLogic is RetractExtension {
         bytes4[] memory functionSelectors = ext.getFunctionSelectors();
 
         // Remove current contract as implementor of function selectors
-        for (uint i = 0; i < functionSelectors.length; i++) {
+        uint256 numberOfFunctionSelectors = functionSelectors.length;
+        for (uint i = 0; i < numberOfFunctionSelectors; i++) {
             if (state.extensionContracts[functionSelectors[i]] == implementor) 
                 delete state.extensionContracts[functionSelectors[i]];
         }
 
         // Search and delete interfaceId
-        for (uint i = 0; i < state.interfaceIds.length; i++) {
-            if (state.interfaceIds[i] == interfaceId) {
+        uint256 numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
+            if (state.implementedInterfaces[i] == interfaceId) {
                 // Swap interfaceId with final item and pop from array for constant time array removal
-                state.interfaceIds[i] = state.interfaceIds[state.interfaceIds.length - 1];
-                state.interfaceIds.pop();
+                state.implementedInterfaces[i] = state.implementedInterfaces[state.implementedInterfaces.length - 1];
+                state.implementedInterfaces.pop();
             }
         }
     }

@@ -56,7 +56,7 @@ contract ReplaceLogic is ReplaceExtension {
 
                 // require the interfaceIds implemented by the old extension is equal to the new one
                 require(
-                    keccak256(abi.encodePacked(newEx.getInterfaceIds())) == keccak256(abi.encodePacked(old.getInterfaceIds())), 
+                    keccak256(abi.encodePacked(newEx.getFunctionSelectors())) == keccak256(abi.encodePacked(old.getFunctionSelectors())), 
                     "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces");
                 
                 // use raw delegate call to re-extend the extension because we have just removed the Extend function
