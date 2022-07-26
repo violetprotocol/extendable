@@ -5,6 +5,7 @@ import "../Extension.sol";
 import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
+import "../../erc165/IERC165Logic.sol";
 
 /**
  * @dev Reference implementation for ExtendLogic which defines the logic to extend

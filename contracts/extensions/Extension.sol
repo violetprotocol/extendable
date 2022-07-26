@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "../utils/CallerContext.sol";
-import "../erc165/IERC165Logic.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -23,7 +22,7 @@ import "../erc165/IERC165Logic.sol";
  *      contract YourExtension is IYourExtension, Extension {...}
  *
  */
-abstract contract Extension is CallerContext, IExtension, IERC165 {
+abstract contract Extension is CallerContext, IExtension {
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
@@ -42,17 +41,17 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
         _registerInterface(type(IExtension).interfaceId);
     }
 
-    function supportsInterface(bytes4 interfaceId) override public virtual returns (bool) {
-        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
-        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
+    // function supportsInterface(bytes4 interfaceId) override public virtual returns (bool) {
+    //     address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
+    //     (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
-        if (success) return abi.decode(result, (bool));
-        else {
-            assembly {
-                revert(result, returndatasize())
-            }
-        }
-    }
+    //     if (success) return abi.decode(result, (bool));
+    //     else {
+    //         assembly {
+    //             revert(result, returndatasize())
+    //         }
+    //     }
+    // }
 
     function _registerInterface(bytes4 interfaceId) internal virtual {
         address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
@@ -70,7 +69,16 @@ abstract contract Extension is CallerContext, IExtension, IERC165 {
      *      ExtensionNotImplemented error
     */
     function _fallback() internal virtual {
-        revert ExtensionNotImplemented();
+        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
+        (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
+
+        if (success) {
+            assembly {
+                returndatacopy(0, 0, returndatasize())
+                return(0, returndatasize())
+            }
+        }
+        else revert ExtensionNotImplemented();
     }
 
     /**
