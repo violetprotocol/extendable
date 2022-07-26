@@ -51,6 +51,8 @@ contract ERC165Logic is IERC165, IERC165Register {
      * - should only be callable by other extensions of the same contract
      */
     function registerInterface(bytes4 interfaceId) override(IERC165Register) public onlyDelegated {
+        require(interfaceId != 0xffffffff, "ERC165: invalid interface id");
+
         ERC165State storage state = ERC165Storage._getState();
         state._supportedInterfaces[interfaceId] = true;
     }
