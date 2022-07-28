@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "../utils/CallerContext.sol";
+import "hardhat/console.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -72,13 +73,13 @@ abstract contract Extension is CallerContext, IExtension {
         address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
 
+        console.logBool(success);
         if (success) {
+            console.logBytes(result);
             assembly {
-                returndatacopy(0, 0, returndatasize())
-                return(0, returndatasize())
+                return(result, returndatasize())
             }
-        }
-        else revert ExtensionNotImplemented();
+        } else revert ExtensionNotImplemented();
     }
 
     /**

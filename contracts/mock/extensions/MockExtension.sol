@@ -19,6 +19,7 @@ contract MockExtension is IMockExtension, Extension {
     }
 
     function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
+        interfaces = new bytes4[](1);
         interfaces[0] = type(IMockExtension).interfaceId;
     }
     
@@ -28,6 +29,7 @@ contract MockExtension is IMockExtension, Extension {
     }
 
     function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
+        selectors = new bytes4[](2);
         selectors[0] = IMockExtension.test.selector;
         selectors[1] = IMockExtension.reverts.selector;
     }
