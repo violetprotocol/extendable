@@ -31,30 +31,29 @@ abstract contract Extension is CallerContext, IExtension {
     constructor() {
         bytes4[] memory interfaces = getImplementedInterfaces();
         for (uint256 i = 0; i < interfaces.length; i++) {
-            registerInterface(interfaces[i]);
+            _registerInterface(interfaces[i]);
         }
 
         bytes4[] memory functions = getFunctionSelectors();
         for (uint256 i = 0; i < functions.length; i++) {
-            registerInterface(functions[i]);
+            _registerInterface(functions[i]);
         }
-        
-        registerInterface(type(IExtension).interfaceId);
+
+        _registerInterface(type(IExtension).interfaceId);
     }
 
-    function supportsInterface(bytes4 interfaceId) external virtual returns (bool) {
-        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
-        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
+    // function supportsInterface(bytes4 interfaceId) external virtual returns (bool) {
+    //     address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
+    //     console.logBytes(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
+    //     console.logBytes(msg.data);
+    //     (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
 
-        if (success) return abi.decode(result, (bool));
-        else {
-            assembly {
-                revert(result, returndatasize())
-            }
-        }
-    }
+    //     assembly {
+    //         return(result, returndatasize())
+    //     }
+    // }
 
-    function registerInterface(bytes4 interfaceId) public virtual {
+    function _registerInterface(bytes4 interfaceId) internal virtual {
         address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
@@ -70,7 +69,14 @@ abstract contract Extension is CallerContext, IExtension {
      *      ExtensionNotImplemented error
     */
     function _fallback() internal virtual {
-        revert ExtensionNotImplemented();
+        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
+        (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
+
+        if (success) {
+            assembly {
+                return(result, returndatasize())
+            }
+        } else revert ExtensionNotImplemented();
     }
 
     /**
