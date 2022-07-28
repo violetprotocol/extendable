@@ -59,16 +59,16 @@ describe("Extension", function () {
     });
 
     it("should integrate with EIP-165 correctly", async function () {
-        expect(await extensionAsEIP165.callStatic.supportsInterface(EIP165_INTERFACE)).to.be.true;
+        expect(await extension.callStatic.supportsInterface(EIP165_INTERFACE)).to.be.true;
     });
 
     it("should implement IExtension correctly", async function () {
-        expect(await extensionAsEIP165.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
+        expect(await extension.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
     });
 
     it("should register extension interface id during constructor correctly", async function () {
-        expect(await extensionAsEIP165.callStatic.supportsInterface(MOCK_LOGIC_INTERFACE)).to.be.true;
-        expect(await extensionAsEIP165.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
+        expect(await extension.callStatic.supportsInterface(MOCK_LOGIC_INTERFACE)).to.be.true;
+        expect(await extension.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
     });
 
     it("should return implemented interfaces correctly", async function () {
