@@ -3,7 +3,7 @@ const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect, assert } = chai;
-const {EXTEND_LOGIC_INTERFACE} = require("./constants");
+const {EXTEND_LOGIC_INTERFACE, singletonFactoryDeployer, singletonFactoryDeploymentTx, singletonFactoryAddress, factoryABI} = require("./constants");
 
 const shouldInitialiseExtendableCorrectly = async (extendableAddress, extendLogicAddress) => {
     const extendable = await getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
@@ -29,8 +29,21 @@ const checkExtensions = async (contract, expectedInterfaceIds, expectedContractA
     expect(await contract.callStatic.getExtensionAddresses()).to.deep.equal(expectedContractAddresses);
 }
 
+const deployERC165Singleton = async (deployer) => {
+    const ERC165Logic = await ethers.getContractFactory("ERC165Logic");
+    const bytecode = (await ERC165Logic.getDeployTransaction()).data;
+
+    await deployer.sendTransaction({ to: singletonFactoryDeployer, value: ethers.utils.parseEther("1") });
+    await ethers.provider.sendTransaction(singletonFactoryDeploymentTx);
+
+    const Factory = new ethers.Contract("0x0000000000000000000000000000000000000000", factoryABI, deployer);
+    const factory = await Factory.attach(singletonFactoryAddress);
+    await factory.deploy(bytecode, "0x0000000000000000000000000000000000000000000000000000000000000000", { gasLimit: "0x07A120" });
+}
+
 module.exports = {
     shouldInitialiseExtendableCorrectly,
     getExtendedContractWithInterface,
-    checkExtensions
+    checkExtensions,
+    deployERC165Singleton
 }

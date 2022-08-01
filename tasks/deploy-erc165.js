@@ -1,11 +1,3 @@
-const { default: Common, Chain, Hardfork } = require("@ethereumjs/common");
-const { FeeMarketEIP1559Transaction, Transaction } = require("@ethereumjs/tx");
-const { bufArrToArr, bigIntToUnpaddedBuffer, bigIntToBuffer } = require("@ethereumjs/util");
-const { keccak256 } = require("@ethersproject/keccak256");
-const { BN } = require("bn.js");
-const { recoverAddress } = require("ethers/lib/utils");
-const { default: RLP } = require("rlp");
-
 require("@nomiclabs/hardhat-web3");
 
 const factoryAddress = "0xce0042B868300000d44A59004Da54A005ffdcf9f";
@@ -21,7 +13,7 @@ module.exports = {
 
         const Factory = new hre.ethers.Contract("0x0000000000000000000000000000000000000000", factoryABI, signer);
         const factory = await Factory.attach(factoryAddress);
-        
+
         const tx = await factory.deploy(deploymentTx.data, "0x0000000000000000000000000000000000000000000000000000000000000000", { gasLimit: "0x07A120" });
         const receipt = await tx.wait();
         console.log(receipt.transactionHash);

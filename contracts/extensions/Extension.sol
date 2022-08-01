@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "../utils/CallerContext.sol";
-import "hardhat/console.sol";
+import "../erc165/IERC165Logic.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -42,18 +42,8 @@ abstract contract Extension is CallerContext, IExtension {
         _registerInterface(type(IExtension).interfaceId);
     }
 
-    // function supportsInterface(bytes4 interfaceId) external virtual returns (bool) {
-    //     address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
-    //     console.logBytes(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
-    //     console.logBytes(msg.data);
-    //     (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
-
-    //     assembly {
-    //         return(result, returndatasize())
-    //     }
-    // }
-
     function _registerInterface(bytes4 interfaceId) internal virtual {
+        // IERC165Register(address(this)).registerInterface(interfaceId);
         address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
