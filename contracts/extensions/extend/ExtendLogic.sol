@@ -38,7 +38,7 @@ contract ExtendLogic is ExtendExtension {
      *
      * Uses PermissioningLogic implementation with `owner` checks.
      *
-     * Restricts extend to `onlyOwner`.
+     * Restricts extend to `onlyOwnerOrSelf`.
      *
      * If `owner` has not been initialised, assume that this is the initial extend call
      * during constructor of Extendable and instantiate `owner` as the caller.
@@ -49,7 +49,7 @@ contract ExtendLogic is ExtendExtension {
     function extend(address extension) override public virtual onlyOwnerOrSelf {
         require(extension.code.length > 0, "Extend: address is not a contract");
 
-        IERC165 erc165Extension = IERC165(payable(extension));
+        IERC165 erc165Extension = IERC165(extension);
         try erc165Extension.supportsInterface(bytes4(0x01ffc9a7)) returns(bool erc165supported) {
             require(erc165supported, "Extend: extension does not implement eip-165");
             require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
@@ -61,17 +61,28 @@ contract ExtendLogic is ExtendExtension {
         ExtendableState storage state = ExtendableStorage._getState();
 
         bytes4[] memory functions = ext.getFunctionSelectors();
-        for (uint256 i = 0; i < functions.length; i++) {
+        uint256 numberOfFunctions = functions.length;
+        for (uint256 i = 0; i < numberOfFunctions; i++) {
             require(
                 state.extensionContracts[functions[i]] == address(0x0),
                 string(abi.encodePacked("Extend: function ", functions[i]," is already implemented by another extension"))
             );
+
+            state.extensionContracts[functions[i]] = extension;
+            // state.implementedFunctions.push(functions[i]);
         }
 
-        bytes4[] memory fullInterfaces = ext.getImplementedInterfaces();
-        for (uint256 i = 0; i < fullInterfaces.length; i++) { // Set the implementer of the full interfaceId to the extension
-            state.implementedInterfaces.push(fullInterfaces[i]);
-            state.extensionContracts[fullInterfaces[i]] = extension;
+        bytes4[] memory interfaces = ext.getImplementedInterfaces();
+        uint256 numberOfInterfaces = interfaces.length;
+        for (uint256 i = 0; i < numberOfInterfaces; i++) { 
+            require(
+                state.extensionContracts[interfaces[i]] == address(0x0),
+                string(abi.encodePacked("Extend: interface ", interfaces[i]," is already implemented by another extension"))
+            );
+
+            // Set the implementer of the full interfaceId to the extension
+            state.implementedInterfaces.push(interfaces[i]);
+            state.extensionContracts[interfaces[i]] = extension;
         }
     }
 
