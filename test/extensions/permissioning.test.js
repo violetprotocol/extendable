@@ -1,11 +1,10 @@
-const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const web3 = require("web3");
 const chai = require("chai");
-const { PERMISSIONING_LOGIC_INTERFACE } = require("../utils/constants")
+const { PERMISSIONING } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
+const { getExtendedContractWithInterface } = require("../utils/utils");
 chai.use(solidity);
-const { expect, assert } = chai;
+const { expect } = chai;
 
 describe("PermissioningLogic", function () {
     let account;
@@ -40,10 +39,15 @@ describe("PermissioningLogic", function () {
     });
 
     it("should register interface id during constructor correctly", async function () {
-        expect(await logic.callStatic.supportsInterface(PERMISSIONING_LOGIC_INTERFACE)).to.be.true;
+        const extensionAsEIP165 = await getExtendedContractWithInterface(logic.address, "ERC165Logic");
+        expect(await extensionAsEIP165.callStatic.supportsInterface(PERMISSIONING.INTERFACE)).to.be.true;
     });
 
-    it("should return interfaceId correctly", async function () {
-        expect(await logic.callStatic.getInterfaceId()).to.equal(PERMISSIONING_LOGIC_INTERFACE);
+    it("should return implemented interfaces correctly", async function () {
+        expect(await logic.callStatic.getImplementedInterfaces()).to.deep.equal([PERMISSIONING.INTERFACE]);
+    });
+
+    it("should return implemented functions correctly", async function () {
+        expect(await logic.callStatic.getFunctionSelectors()).to.deep.equal(PERMISSIONING.SELECTORS);
     });
 });

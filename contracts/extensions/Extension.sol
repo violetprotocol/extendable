@@ -23,7 +23,7 @@ import "../erc165/IERC165Logic.sol";
  *      contract YourExtension is IYourExtension, Extension {...}
  *
  */
-abstract contract Extension is CallerContext, IExtension {
+abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Register {
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
@@ -31,25 +31,38 @@ abstract contract Extension is CallerContext, IExtension {
     constructor() {
         bytes4[] memory interfaces = getImplementedInterfaces();
         for (uint256 i = 0; i < interfaces.length; i++) {
-            _registerInterface(interfaces[i]);
+            registerInterface(interfaces[i]);
         }
 
         bytes4[] memory functions = getFunctionSelectors();
         for (uint256 i = 0; i < functions.length; i++) {
-            _registerInterface(functions[i]);
+            registerInterface(functions[i]);
         }
 
-        _registerInterface(type(IExtension).interfaceId);
+        registerInterface(type(IExtension).interfaceId);
     }
 
-    function _registerInterface(bytes4 interfaceId) internal virtual {
-        // IERC165Register(address(this)).registerInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) external override virtual returns(bool) {
         address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
-        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
+        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
         if (!success) {
             assembly {
                 revert(result, returndatasize())
+            }
+        }
+
+        return abi.decode(result, (bool));
+    }
+
+    function registerInterface(bytes4 interfaceId) public override virtual {
+        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
+        (bool success, ) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
+
+        if (!success) {
+            assembly {
+                returndatacopy(0, 0, returndatasize())
+                revert(0, returndatasize())
             }
         }
     }
@@ -59,14 +72,7 @@ abstract contract Extension is CallerContext, IExtension {
      *      ExtensionNotImplemented error
     */
     function _fallback() internal virtual {
-        address ERC165Logic = address(0x23A6e4d33CFF52F908f3Ed8f7E883D2A91A4918f);
-        (bool success, bytes memory result) = ERC165Logic.delegatecall(msg.data);
-
-        if (success) {
-            assembly {
-                return(result, returndatasize())
-            }
-        } else revert ExtensionNotImplemented();
+        revert ExtensionNotImplemented();
     }
 
     /**

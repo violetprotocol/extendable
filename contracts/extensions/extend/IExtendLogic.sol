@@ -63,17 +63,21 @@ abstract contract ExtendExtension is IExtendLogic, Extension {
     /**
      * @dev see {IExtension-getInterfaceId}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
-        interfaces[0] = type(IExtendLogic).interfaceId;
+    function getImplementedInterfaces() override public pure returns(bytes4[] memory) {
+        bytes4[] memory implementedInterfaces = new bytes4[](1);
+        implementedInterfaces[0] = type(IExtendLogic).interfaceId;
+        return implementedInterfaces;
     }
 
     /**
      * @dev see {IExtension-getFunctionSelectors}
     */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
-        selectors[0] = IExtendLogic.extend.selector;
-        selectors[1] = IExtendLogic.getCurrentInterface.selector;
-        selectors[2] = IExtendLogic.getExtensionAddresses.selector;
-        selectors[3] = IExtendLogic.getExtensions.selector;
+    function getFunctionSelectors() override public pure returns(bytes4[] memory) {
+        bytes4[] memory implementedFunctions = new bytes4[](4);
+        implementedFunctions[0] = IExtendLogic.extend.selector;
+        implementedFunctions[1] = IExtendLogic.getCurrentInterface.selector;
+        implementedFunctions[2] = IExtendLogic.getExtensionAddresses.selector;
+        implementedFunctions[3] = IExtendLogic.getExtensions.selector;
+        return implementedFunctions;
     }
 }

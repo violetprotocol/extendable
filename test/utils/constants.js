@@ -1,8 +1,23 @@
 module.exports = {
     EIP165_INTERFACE: "0x01ffc9a7",
     BASE_EXTENSION_INTERFACE: "0xe74891b2",
-    EXTEND_LOGIC_INTERFACE: "0xa501cf1f",
-    PERMISSIONING_LOGIC_INTERFACE: "0xe0f6c5f3",
+    EXTEND: {
+        INTERFACE: "0xa501cf1f",
+        SELECTORS: [
+            "0x82005715",
+            "0xa9cf0ea9",
+            "0x0d794dc0",
+            "0x83b7db63"
+        ]
+    },
+    PERMISSIONING: {
+        INTERFACE: "0xe0f6c5f3",
+        SELECTORS: [
+            "0xe1c7392a",
+            "0x880cdc31",
+            "0x893d20e8"
+        ]
+    },
     RETRACT_LOGIC_INTERFACE: "0xf9fb51c8",
     REPLACE_LOGIC_INTERFACE: "0x631de4d6",
     REGISTER_LOGIC_INTERFACE: "0x32434a2e",

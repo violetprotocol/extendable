@@ -1,9 +1,7 @@
-const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 const { erc165SingletonAddress } = require("../utils/constants");
-const { deployERC165Singleton } = require("../utils/utils");
 chai.use(solidity);
 const { expect, assert } = chai;
 
@@ -16,8 +14,6 @@ describe("ERC165Logic", function () {
 
     before("deploy new", async function () {
         [account, account2] = await ethers.getSigners();
-        
-        await deployERC165Singleton(account);
 
         const ERC165Logic = await ethers.getContractFactory("ERC165Logic");
         const ERC165Caller = await ethers.getContractFactory("ERC165Caller");
@@ -44,32 +40,3 @@ describe("ERC165Logic", function () {
         });
     });
 });
-
-const factoryABI = [
-    {
-        "constant": false,
-        "inputs": [
-            {
-                "internalType": "bytes",
-                "name": "_initCode",
-                "type": "bytes"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "_salt",
-                "type": "bytes32"
-            }
-        ],
-        "name": "deploy",
-        "outputs": [
-            {
-                "internalType": "address payable",
-                "name": "createdContract",
-                "type": "address"
-            }
-        ],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-]

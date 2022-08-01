@@ -42,16 +42,20 @@ abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     /**
      * @dev see {IExtension-getInterfaceId}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
-        interfaces[0] = type(IPermissioningLogic).interfaceId;
+    function getImplementedInterfaces() override public pure returns(bytes4[] memory) {
+        bytes4[] memory implementedInterfaces = new bytes4[](1);
+        implementedInterfaces[0] = type(IPermissioningLogic).interfaceId;
+        return implementedInterfaces;
     }
 
     /**
      * @dev see {IExtension-getFunctionSelectors}
     */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
-        selectors[0] = IPermissioningLogic.init.selector;
-        selectors[1] = IPermissioningLogic.updateOwner.selector;
-        selectors[2] = IPermissioningLogic.getOwner.selector;
+    function getFunctionSelectors() override public pure returns(bytes4[] memory) {
+        bytes4[] memory implementedFunctions = new bytes4[](3);
+        implementedFunctions[0] = IPermissioningLogic.init.selector;
+        implementedFunctions[1] = IPermissioningLogic.updateOwner.selector;
+        implementedFunctions[2] = IPermissioningLogic.getOwner.selector;
+        return implementedFunctions;
     }
 }

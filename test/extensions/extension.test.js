@@ -6,9 +6,9 @@ const {
     MOCK_LOGIC_INTERFACE
 } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
-const { getExtendedContractWithInterface, deployERC165Singleton } = require("../utils/utils");
+const { getExtendedContractWithInterface } = require("../utils/utils");
 chai.use(solidity);
-const { expect, assert } = chai;
+const { expect } = chai;
 
 describe("Extension", function () {
     let account;
@@ -18,8 +18,6 @@ describe("Extension", function () {
 
     before("deploy new", async function () {
         [account, account2] = await ethers.getSigners();
-
-        await deployERC165Singleton(account);
         
         const Extension = await ethers.getContractFactory("MockExtension");
         const Caller = await ethers.getContractFactory("MockExtensionCaller");
