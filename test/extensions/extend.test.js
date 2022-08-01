@@ -71,6 +71,6 @@ describe("ExtendLogic", function () {
     });
 
     it("extend should fail with same extension", async function () {
-        await expect(caller.callExtend(extendLogic.address)).to.be.revertedWith("Extend: extension already exists for interfaceId");
+        await expect(caller.callExtend(extendLogic.address)).to.be.revertedWith(`Extend: function ${EXTEND.SELECTORS[0]} is already implemented by ${extendLogic.address.toLowerCase()}`);
     });
 });

@@ -2,6 +2,7 @@ const { ethers } = require("hardhat");
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 const { erc165SingletonAddress } = require("../utils/constants");
+const { deployERC165Singleton } = require("../utils/utils");
 chai.use(solidity);
 const { expect, assert } = chai;
 

@@ -64,6 +64,6 @@
     "web3": "^1.7.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.0"
+    "@openzeppelin/contracts": "^4.7.0"
   }
 }

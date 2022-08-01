@@ -1,8 +1,6 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import { ExtendableState, ExtendableStorage } from "../storage/ExtendableStorage.sol";
-
 /**
  * @dev Interface of the ERC165 standard, as defined in the
  * https://eips.ethereum.org/EIPS/eip-165[EIP].

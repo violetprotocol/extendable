@@ -6,6 +6,7 @@ import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 import "../../erc165/IERC165Logic.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @dev Reference implementation for ExtendLogic which defines the logic to extend
@@ -65,11 +66,11 @@ contract ExtendLogic is ExtendExtension {
         for (uint256 i = 0; i < numberOfFunctions; i++) {
             require(
                 state.extensionContracts[functions[i]] == address(0x0),
-                string(abi.encodePacked("Extend: function ", functions[i]," is already implemented by another extension"))
+                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functions[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[functions[i]])))
             );
 
             state.extensionContracts[functions[i]] = extension;
-            // state.implementedFunctions.push(functions[i]);
+            state.implementedFunctions.push(functions[i]);
         }
 
         bytes4[] memory interfaces = ext.getImplementedInterfaces();
@@ -77,7 +78,7 @@ contract ExtendLogic is ExtendExtension {
         for (uint256 i = 0; i < numberOfInterfaces; i++) { 
             require(
                 state.extensionContracts[interfaces[i]] == address(0x0),
-                string(abi.encodePacked("Extend: interface ", interfaces[i]," is already implemented by another extension"))
+                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaces[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[interfaces[i]])))
             );
 
             // Set the implementer of the full interfaceId to the extension
