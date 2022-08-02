@@ -34,10 +34,15 @@ interface IExtendLogic {
     function getCurrentInterface() external view returns(string memory fullInterface);
 
     /**
-     * @dev Returns an array of interfaceIds that are currently supported by the current
+     * @dev Returns an array of interfaceIds that are currently implemented by the current
      *      Extendable contract
     */
-    function getExtensions() external view returns(bytes4[] memory);
+    function getExtensionsInterfaceIds() external view returns(bytes4[] memory);
+    /**
+     * @dev Returns an array of function selectors that are currently implemented by the current
+     *      Extendable contract
+    */
+    function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);
 
     /**
      * @dev Returns an array of all extension addresses that are currently attached to the
@@ -51,33 +56,30 @@ interface IExtendLogic {
 */
 abstract contract ExtendExtension is IExtendLogic, Extension {
     /**
-     * @dev see {IExtension-getInterface}
+     * @dev see {IExtension-getSolidityInterface}
     */
-    function getInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override public pure returns(string memory) {
         return  "function extend(address extension) external;\n"
                 "function getCurrentInterface() external view returns(string memory);\n"
-                "function getExtensions() external view returns(bytes4[] memory);\n"
+                "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n"
+                "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n"
                 "function getExtensionAddresses() external view returns(address[] memory);\n";
     }
 
     /**
-     * @dev see {IExtension-getInterfaceId}
+     * @dev see {IExtension-getInterface}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory) {
-        bytes4[] memory implementedInterfaces = new bytes4[](1);
-        implementedInterfaces[0] = type(IExtendLogic).interfaceId;
-        return implementedInterfaces;
-    }
-
-    /**
-     * @dev see {IExtension-getFunctionSelectors}
-    */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory) {
-        bytes4[] memory implementedFunctions = new bytes4[](4);
-        implementedFunctions[0] = IExtendLogic.extend.selector;
-        implementedFunctions[1] = IExtendLogic.getCurrentInterface.selector;
-        implementedFunctions[2] = IExtendLogic.getExtensionAddresses.selector;
-        implementedFunctions[3] = IExtendLogic.getExtensions.selector;
-        return implementedFunctions;
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+        interfaces[0] = Interface(
+            type(IExtendLogic).interfaceId,
+            abi.decode(abi.encode([
+                IExtendLogic.extend.selector,
+                IExtendLogic.getCurrentInterface.selector,
+                IExtendLogic.getExtensionsInterfaceIds.selector,
+                IExtendLogic.getExtensionsFunctionSelectors.selector,
+                IExtendLogic.getExtensionAddresses.selector
+            ]), (bytes4[]))
+        );
     }
 }

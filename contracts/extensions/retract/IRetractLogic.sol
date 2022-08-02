@@ -15,40 +15,26 @@ interface IRetractLogic {
      * - `extension` must be an attached extension
     */
     function retract(address extension) external;
-
-    /**
-     * @dev Removes an extension from your Extendable contract that implements `interfaceId`
-     *
-     * The extension that implements `interfaceId` is found and unmarked as the implementor of
-     * `interfaceId` and is also removed of all function selectors that contribute to its implementation
-     *
-     * Requirements:
-     * - `interfaceId` must be implemented by an attached extension
-    */
-    function retractImplementionOf(bytes4 interfaceId) external;
 }
 
 abstract contract RetractExtension is IRetractLogic, Extension {
     /**
+     * @dev see {IExtension-getSolidityInterface}
+    */
+    function getSolidityInterface() override public pure returns(string memory) {
+        return  "function retract(address extension) external;\n";
+    }
+
+    /**
      * @dev see {IExtension-getImplementedInterfaces}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
-        interfaces[0] = type(IRetractLogic).interfaceId;
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function retract(address extension) external;\n"
-                "function retractImplementionOf(bytes4 interfaceId) external;\n";
-    }
-
-    /**
-     * @dev see {IExtension-getFunctionSelectors}
-    */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
-        selectors[0] = IRetractLogic.retract.selector;
-        selectors[1] = IRetractLogic.retractImplementionOf.selector;
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+        interfaces[0] = Interface(
+            type(IRetractLogic).interfaceId,
+            abi.decode(abi.encode([
+                IRetractLogic.retract.selector
+            ]), (bytes4[]))
+        );
     }
 }

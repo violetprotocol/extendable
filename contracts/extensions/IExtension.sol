@@ -1,6 +1,11 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
+struct Interface {
+    bytes4 interfaceId;
+    bytes4[] functions;
+}
+
 /**
  * @dev Interface for Extension
 */
@@ -20,17 +25,9 @@ interface IExtension {
      * to be able to easily inspect and query for the current state of the interface and
      * integrate with it.
      *
-     * See {ExtendLogic-getInterface} for an example.
+     * See {ExtendLogic-getSolidityInterface} for an example.
     */
-    function getInterface() external pure returns(string memory);
-
-    /**
-     * @dev Returns the function selectors implemented by the Extension
-     *
-     * Provides a more granular introspection routine into an Extension, returning the function
-     * selectors (bytes4) for all functions implemented by the Extension
-    */
-    function getFunctionSelectors() external pure returns(bytes4[] memory);
+    function getSolidityInterface() external pure returns(string memory);
 
     /**
      * @dev Returns the interface IDs that are implemented by the Extension
@@ -48,5 +45,5 @@ interface IExtension {
      * Excludes any functions either already described by other interface definitions
      * that are not developed on top of this backbone i.e. EIP-165, IExtension
     */
-    function getImplementedInterfaces() external pure returns(bytes4[] memory interfaces);
+    function getInterface() external pure returns(Interface[] memory interfaces);
 }

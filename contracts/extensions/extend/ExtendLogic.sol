@@ -59,32 +59,9 @@ contract ExtendLogic is ExtendExtension {
         }
 
         IExtension ext = IExtension(payable(extension));
-        ExtendableState storage state = ExtendableStorage._getState();
 
-        bytes4[] memory functions = ext.getFunctionSelectors();
-        uint256 numberOfFunctions = functions.length;
-        for (uint256 i = 0; i < numberOfFunctions; i++) {
-            require(
-                state.extensionContracts[functions[i]] == address(0x0),
-                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functions[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[functions[i]])))
-            );
-
-            state.extensionContracts[functions[i]] = extension;
-            state.implementedFunctions.push(functions[i]);
-        }
-
-        bytes4[] memory interfaces = ext.getImplementedInterfaces();
-        uint256 numberOfInterfaces = interfaces.length;
-        for (uint256 i = 0; i < numberOfInterfaces; i++) { 
-            require(
-                state.extensionContracts[interfaces[i]] == address(0x0),
-                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaces[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[interfaces[i]])))
-            );
-
-            // Set the implementer of the full interfaceId to the extension
-            state.implementedInterfaces.push(interfaces[i]);
-            state.extensionContracts[interfaces[i]] = extension;
-        }
+        Interface[] memory interfaces = ext.getInterface();
+        registerInterfaces(interfaces, extension);
     }
 
     /**
@@ -95,7 +72,7 @@ contract ExtendLogic is ExtendExtension {
         for (uint i = 0; i < state.implementedInterfaces.length; i++) {
             bytes4 interfaceId = state.implementedInterfaces[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
-            fullInterface = string(abi.encodePacked(fullInterface, logic.getInterface()));
+            fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
         }
 
         // TO-DO optimise this return to a standardised format with comments for developers
@@ -103,11 +80,34 @@ contract ExtendLogic is ExtendExtension {
     }
 
     /**
-     * @dev see {IExtendLogic-getExtensions}
+     * @dev see {IExtendLogic-getExtensionsInterfaceIds}
     */
-    function getExtensions() override public view returns(bytes4[] memory) {
+    function getExtensionsInterfaceIds() override public view returns(bytes4[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
         return state.implementedInterfaces;
+    }
+
+    /**
+     * @dev see {IExtendLogic-getExtensionsFunctionSelectors}
+    */
+    function getExtensionsFunctionSelectors() override public view returns(bytes4[] memory functionSelectors) {
+        ExtendableState storage state = ExtendableStorage._getState();
+        bytes4[] storage implementedInterfaces = state.implementedInterfaces;
+        
+        uint256 numberOfFunctions = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+                numberOfFunctions += state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+        }
+
+        functionSelectors = new bytes4[](numberOfFunctions);
+        uint256 counter = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+            uint256 functionNumber = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+            for (uint256 j = 0; j < functionNumber; j++) {
+                functionSelectors[counter] = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]][j];
+                counter++;
+            }
+        }
     }
 
     /**
@@ -136,6 +136,41 @@ contract ExtendLogic is ExtendExtension {
         // Set the owner to the transaction sender if owner has not been initialised
         if (state.owner == address(0x0)) {
             state.owner = _lastCaller();
+        }
+    }
+
+    function registerInterfaces(Interface[] memory interfaces, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each interface as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfInterfacesImplemented = interfaces.length;
+        for (uint256 i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = interfaces[i].interfaceId;
+
+            require(
+                state.extensionContracts[interfaceId] == address(0x0),
+                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaceId)), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[interfaceId])))
+            );
+
+            registerFunctions(interfaceId, interfaces[i].functions, extension);
+            state.extensionContracts[interfaceId] = extension;
+            state.implementedInterfaces.push(interfaceId);
+        }
+    }
+
+    function registerFunctions(bytes4 interfaceId, bytes4[] memory functionSelectors, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each function as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfFunctions = functionSelectors.length;
+        for (uint256 i = 0; i < numberOfFunctions; i++) {
+            require(
+                state.extensionContracts[functionSelectors[i]] == address(0x0),
+                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functionSelectors[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[functionSelectors[i]])))
+            );
+
+            state.extensionContracts[functionSelectors[i]] = extension;
+            state.implementedFunctionsByInterfaceId[interfaceId].push(functionSelectors[i]);
         }
     }
 }

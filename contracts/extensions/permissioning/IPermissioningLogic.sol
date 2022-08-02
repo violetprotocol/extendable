@@ -31,31 +31,26 @@ interface IPermissioningLogic {
 */
 abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     /**
-     * @dev see {IExtension-getInterface}
+     * @dev see {IExtension-getSolidityInterface}
     */
-    function getInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override public pure returns(string memory) {
         return  "function init() external;\n"
                 "function updateOwner(address newOwner) external;\n"
                 "function getOwner() external view returns(address);\n";
     }
 
     /**
-     * @dev see {IExtension-getInterfaceId}
+     * @dev see {IExtension-getInterface}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory) {
-        bytes4[] memory implementedInterfaces = new bytes4[](1);
-        implementedInterfaces[0] = type(IPermissioningLogic).interfaceId;
-        return implementedInterfaces;
-    }
-
-    /**
-     * @dev see {IExtension-getFunctionSelectors}
-    */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory) {
-        bytes4[] memory implementedFunctions = new bytes4[](3);
-        implementedFunctions[0] = IPermissioningLogic.init.selector;
-        implementedFunctions[1] = IPermissioningLogic.updateOwner.selector;
-        implementedFunctions[2] = IPermissioningLogic.getOwner.selector;
-        return implementedFunctions;
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+        interfaces[0] = Interface(
+            type(IPermissioningLogic).interfaceId,
+            abi.decode(abi.encode([
+                IPermissioningLogic.init.selector,
+                IPermissioningLogic.updateOwner.selector,
+                IPermissioningLogic.getOwner.selector
+            ]), (bytes4[]))
+        );
     }
 }

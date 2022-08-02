@@ -22,18 +22,20 @@ contract MockCallerContextLogic is IMockCallerContextLogic, Extension {
     function getLastExternalCaller() override public view returns(address) {
         return _lastExternalCaller();
     }
-
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
-        interfaces[0] = type(IMockCallerContextLogic).interfaceId;
-    }
     
-    function getInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override public pure returns(string memory) {
         return  "function getCurrentCaller() external returns(address);\n"
                 "function getLastExternalCaller() external returns(address);\n";
     }
-    
-    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
-        selectors[0] = IMockCallerContextLogic.getCurrentCaller.selector;
-        selectors[0] = IMockCallerContextLogic.getLastExternalCaller.selector;
+
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+        interfaces[0] = Interface(
+            type(IMockCallerContextLogic).interfaceId,
+            abi.decode(abi.encode([
+                IMockCallerContextLogic.getCurrentCaller.selector,
+                IMockCallerContextLogic.getLastExternalCaller.selector
+            ]), (bytes4[]))
+        );
     }
 }

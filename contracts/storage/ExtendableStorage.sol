@@ -9,7 +9,7 @@ struct ExtendableState {
     bytes4[] implementedInterfaces;
 
     // Array of function selectors extended by the Extendable contract instance
-    bytes4[] implementedFunctions;
+    mapping(bytes4 => bytes4[]) implementedFunctionsByInterfaceId;
 
     // Mapping of interfaceId/functionSelector to the extension address that implements it
     mapping(bytes4 => address) extensionContracts;

@@ -29,14 +29,13 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
      *      https://eips.ethereum.org/EIPS/eip-165
     */
     constructor() {
-        bytes4[] memory interfaces = getImplementedInterfaces();
+        Interface[] memory interfaces = getInterface();
         for (uint256 i = 0; i < interfaces.length; i++) {
-            registerInterface(interfaces[i]);
-        }
+            registerInterface(interfaces[i].interfaceId);
 
-        bytes4[] memory functions = getFunctionSelectors();
-        for (uint256 i = 0; i < functions.length; i++) {
-            registerInterface(functions[i]);
+            for (uint256 j = 0; j < interfaces[i].functions.length; j++) {
+                registerInterface(interfaces[i].functions[j]);
+            }
         }
 
         registerInterface(type(IExtension).interfaceId);
@@ -94,12 +93,5 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
      *
      * Must be implemented in inherited contract.
     */
-    function getFunctionSelectors() override public virtual pure returns(bytes4[] memory);
-
-    /**
-     * @dev Virtual override declaration of getInterfaceId() function to silence compiler
-     *
-     * Must be implemented in inherited contract.
-    */
-    function getImplementedInterfaces() override public virtual pure returns(bytes4[] memory);
+    function getInterface() override public virtual pure returns(Interface[] memory);
 }

@@ -31,23 +31,21 @@ interface IReplaceLogic {
 
 abstract contract ReplaceExtension is IReplaceLogic, Extension {
     /**
-     * @dev see {IExtension-getInterfaceId}
+     * @dev see {IExtension-getSolidityInterface}
     */
-    function getImplementedInterfaces() override public pure returns(bytes4[] memory interfaces) {
-        interfaces[0] = type(IReplaceLogic).interfaceId;
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override public pure returns(string memory) {
         return  "function replace(address oldExtension, address newExtension) external;\n";
     }
-
     /**
-     * @dev see {IExtension-getFunctionSelectors}
+     * @dev see {IExtension-getInterfaceId}
     */
-    function getFunctionSelectors() override public pure returns(bytes4[] memory selectors) {
-        selectors[0] = IReplaceLogic.replace.selector;
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+        interfaces[0] = Interface(
+            type(IReplaceLogic).interfaceId,
+            abi.decode(abi.encode([
+                IReplaceLogic.replace.selector
+            ]), (bytes4[]))
+        );
     }
 }
