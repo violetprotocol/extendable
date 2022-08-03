@@ -5,6 +5,7 @@ import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "../utils/CallerContext.sol";
 import "../erc165/IERC165Logic.sol";
+import "hardhat/console.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
@@ -93,5 +94,5 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
      *
      * Must be implemented in inherited contract.
     */
-    function getInterface() override public virtual pure returns(Interface[] memory);
+    function getInterface() override public virtual returns(Interface[] memory);
 }

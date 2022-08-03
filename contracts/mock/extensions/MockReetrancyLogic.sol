@@ -245,39 +245,41 @@ contract MockReentrancyLogic is IMockReentrancyLogic, Extension, ReentrancyGuard
 
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](27);
+        functions[0] = IMockReentrancyLogic.atomic.selector;
+        functions[1] = IMockReentrancyLogic.reatomic.selector;
+        functions[2] = IMockReentrancyLogic.singleAtomic.selector;
+        functions[3] = IMockReentrancyLogic.singleReatomic.selector;
+        functions[4] = IMockReentrancyLogic.singleAtomicIntra.selector;
+        functions[5] = IMockReentrancyLogic.singleAtomicStrict.selector;
+        functions[6] = IMockReentrancyLogic.doubleReatomic.selector;
+        functions[7] = IMockReentrancyLogic.doubleAtomicIntra.selector;
+        functions[8] = IMockReentrancyLogic.doubleAtomicStrict.selector;
+
+        functions[9] = IMockReentrancyLogic.intra.selector;
+        functions[10] = IMockReentrancyLogic.reIntra.selector;
+        functions[11] = IMockReentrancyLogic.singleIntra.selector;
+        functions[12] = IMockReentrancyLogic.singleReIntra.selector;
+        functions[13] = IMockReentrancyLogic.singleIntraAtomic.selector;
+        functions[14] = IMockReentrancyLogic.singleIntraStrict.selector;
+        functions[15] = IMockReentrancyLogic.doubleReIntra.selector;
+        functions[16] = IMockReentrancyLogic.doubleIntraAtomic.selector;
+        functions[17] = IMockReentrancyLogic.doubleIntraStrict.selector;
+
+        functions[18] = IMockReentrancyLogic.strict.selector;
+        functions[19] = IMockReentrancyLogic.reStrict.selector;
+        functions[20] = IMockReentrancyLogic.singleStrict.selector;
+        functions[21] = IMockReentrancyLogic.singleReStrict.selector;
+        functions[22] = IMockReentrancyLogic.singleStrictAtomic.selector;
+        functions[23] = IMockReentrancyLogic.singleStrictIntra.selector;
+        functions[24] = IMockReentrancyLogic.doubleReStrict.selector;
+        functions[25] = IMockReentrancyLogic.doubleStrictAtomic.selector;
+        functions[26] = IMockReentrancyLogic.doubleStrictIntra.selector;
+
         interfaces[0] = Interface(
             type(IMockReentrancyLogic).interfaceId,
-            abi.decode(abi.encode([
-                IMockReentrancyLogic.atomic.selector,
-                IMockReentrancyLogic.reatomic.selector,
-                IMockReentrancyLogic.singleAtomic.selector,
-                IMockReentrancyLogic.singleReatomic.selector,
-                IMockReentrancyLogic.singleAtomicIntra.selector,
-                IMockReentrancyLogic.singleAtomicStrict.selector,
-                IMockReentrancyLogic.doubleReatomic.selector,
-                IMockReentrancyLogic.doubleAtomicIntra.selector,
-                IMockReentrancyLogic.doubleAtomicStrict.selector,
-
-                IMockReentrancyLogic.intra.selector,
-                IMockReentrancyLogic.reIntra.selector,
-                IMockReentrancyLogic.singleIntra.selector,
-                IMockReentrancyLogic.singleReIntra.selector,
-                IMockReentrancyLogic.singleIntraAtomic.selector,
-                IMockReentrancyLogic.singleIntraStrict.selector,
-                IMockReentrancyLogic.doubleReIntra.selector,
-                IMockReentrancyLogic.doubleIntraAtomic.selector,
-                IMockReentrancyLogic.doubleIntraStrict.selector,
-
-                IMockReentrancyLogic.strict.selector,
-                IMockReentrancyLogic.reStrict.selector,
-                IMockReentrancyLogic.singleStrict.selector,
-                IMockReentrancyLogic.singleReStrict.selector,
-                IMockReentrancyLogic.singleStrictAtomic.selector,
-                IMockReentrancyLogic.singleStrictIntra.selector,
-                IMockReentrancyLogic.doubleReStrict.selector,
-                IMockReentrancyLogic.doubleStrictAtomic.selector,
-                IMockReentrancyLogic.doubleStrictIntra.selector
-            ]), (bytes4[]))
+            functions
         );
     }
     

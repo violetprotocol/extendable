@@ -1,6 +1,13 @@
 module.exports = {
     EIP165_INTERFACE: "0x01ffc9a7",
-    BASE_EXTENSION_INTERFACE: "0xe74891b2",
+    BASE_EXTENSION_INTERFACE: "0xef0838e2",
+    MOCK_EXTENSION: {
+        INTERFACE: "0xc36446a4",
+        SELECTORS: [
+            "0xf8a8fd6d",
+            "0x3bccbbc9"
+        ]
+    },
     EXTEND: {
         INTERFACE: "0x23001c73",
         SELECTORS: [
@@ -35,7 +42,6 @@ module.exports = {
     DEPLOY_LOGIC_INTERFACE: "0x0570b1fa",
     TOKEN_LOGIC_INTERFACE: "0x40c10f19",
     STORAGE_GETTER_LOGIC_INTERFACE: "0xa75cdf14",
-    MOCK_LOGIC_INTERFACE: "0xc36446a4",
     MOCK_CALLER_CONTEXT_INTERFACE: "0x26cbf720",
     MOCK_DEEP_CALLER_CONTEXT_INTERFACE: "0xf9413ffd",
     MOCK_REENTRANCY_INTERFACE: "0x7a2f6ac8",

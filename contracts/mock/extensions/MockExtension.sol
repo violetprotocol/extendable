@@ -25,12 +25,14 @@ contract MockExtension is IMockExtension, Extension {
 
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](2);
+        functions[0] = IMockExtension.test.selector;
+        functions[1] = IMockExtension.reverts.selector;
+
         interfaces[0] = Interface(
             type(IMockExtension).interfaceId,
-            abi.decode(abi.encode([
-                IMockExtension.test.selector,
-                IMockExtension.reverts.selector
-            ]), (bytes4[]))
+            functions
         );
     }
 }

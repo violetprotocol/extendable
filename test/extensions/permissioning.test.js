@@ -44,10 +44,14 @@ describe("PermissioningLogic", function () {
     });
 
     it("should return implemented interfaces correctly", async function () {
-        expect(await logic.callStatic.getImplementedInterfaces()).to.deep.equal([PERMISSIONING.INTERFACE]);
+        expect(await logic.callStatic.getInterface()).to.deep.equal([[PERMISSIONING.INTERFACE, PERMISSIONING.SELECTORS]]);
     });
 
     it("should return implemented functions correctly", async function () {
-        expect(await logic.callStatic.getFunctionSelectors()).to.deep.equal(PERMISSIONING.SELECTORS);
+        expect(await logic.callStatic.getSolidityInterface()).to.equal("".concat(
+            "function init() external;\n",
+            "function updateOwner(address newOwner) external;\n",
+            "function getOwner() external view returns(address);\n"
+        ));
     });
 });

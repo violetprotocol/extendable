@@ -30,12 +30,14 @@ contract MockDeepCallerContextLogic is IMockDeepCallerContextLogic, Extension {
 
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
+        
+        bytes4[] memory functions = new bytes4[](2);
+        functions[0] = IMockDeepCallerContextLogic.getDeepCurrentCaller.selector;
+        functions[1] = IMockDeepCallerContextLogic.getDeepLastExternalCaller.selector;
+
         interfaces[0] = Interface(
             type(IMockDeepCallerContextLogic).interfaceId,
-            abi.decode(abi.encode([
-                IMockDeepCallerContextLogic.getDeepCurrentCaller.selector,
-                IMockDeepCallerContextLogic.getDeepLastExternalCaller.selector
-            ]), (bytes4[]))
+            functions
         );
     }
 }

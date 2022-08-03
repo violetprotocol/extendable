@@ -30,11 +30,13 @@ abstract contract RetractExtension is IRetractLogic, Extension {
     */
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](1);
+        functions[0] = IRetractLogic.retract.selector;
+
         interfaces[0] = Interface(
             type(IRetractLogic).interfaceId,
-            abi.decode(abi.encode([
-                IRetractLogic.retract.selector
-            ]), (bytes4[]))
+            functions
         );
     }
 }

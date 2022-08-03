@@ -5,6 +5,7 @@ import "../Extension.sol";
 import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
+import "hardhat/console.sol";
 
 contract RetractLogic is RetractExtension {
     /**
@@ -23,20 +24,24 @@ contract RetractLogic is RetractExtension {
     /**
      * @dev see {IRetractLogic-retract}
     */
-    function retract(address extension) override public virtual onlyOwnerOrSelf {
+    function retract(address extension) override external virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getState();
 
         // Search for extension in interfaceIds
         uint256 numberOfInterfacesImplemented = state.implementedInterfaces.length;
-        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
-            bytes4 interfaceId = state.implementedInterfaces[i];
+
+        // we start with index 1 and reduce by one due to line 43 shortening the array
+        // we need to decrement the counter if we shorten the array, but uint cannot be < 0
+        for (uint i = 1; i < numberOfInterfacesImplemented + 1; i++) {
+            uint256 decrementedIndex = i - 1;
+            bytes4 interfaceId = state.implementedInterfaces[decrementedIndex];
             address currentExtension = state.extensionContracts[interfaceId];
 
             // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
                 // Remove interface implementor
                 delete state.extensionContracts[interfaceId];
-                state.implementedInterfaces[i] = state.implementedInterfaces[state.implementedInterfaces.length - 1];
+                state.implementedInterfaces[decrementedIndex] = state.implementedInterfaces[numberOfInterfacesImplemented - 1];
                 state.implementedInterfaces.pop();
 
                 // Remove function selector implementor
@@ -46,6 +51,9 @@ contract RetractLogic is RetractExtension {
                     delete state.extensionContracts[functionSelector];
                 }
                 delete state.implementedFunctionsByInterfaceId[interfaceId];
+
+                numberOfInterfacesImplemented--;
+                i--;
             }
         }
     }

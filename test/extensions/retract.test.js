@@ -47,6 +47,21 @@ describe("RetractLogic", function () {
         expect(await caller.callStatic.getOwner(permissioningLogic.address)).to.equal(account.address);
     });
 
+    it("should register interface id during constructor correctly", async function () {
+        const extensionAsEIP165 = await utils.getExtendedContractWithInterface(retractLogic.address, "ERC165Logic");
+        expect(await extensionAsEIP165.callStatic.supportsInterface(RETRACT.INTERFACE)).to.be.true;
+    });
+
+    it("should return implemented interfaces correctly", async function () {
+        expect(await retractLogic.callStatic.getInterface()).to.deep.equal([[RETRACT.INTERFACE, RETRACT.SELECTORS]]);
+    });
+
+    it("should return solidity interface correctly", async function () {
+        expect(await retractLogic.callStatic.getSolidityInterface()).to.equal("".concat(
+            "function retract(address extension) external;\n"
+        ));
+    });
+
     it("extend should succeed", async function () {
         await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
@@ -85,20 +100,5 @@ describe("RetractLogic", function () {
     it("retract should succeed", async function () {
         await expect(caller.callRetract(extendLogic.address)).to.not.be.reverted;
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([REPLACE.INTERFACE, RETRACT.INTERFACE]);
-        // expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...REPLACE.SELECTORS, ...RETRACT.SELECTORS]);
-        // expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([replaceLogic.address, retractLogic.address]);
-    });
-
-    it("should register interface id during constructor correctly", async function () {
-        const extensionAsEIP165 = await utils.getExtendedContractWithInterface(extendLogic.address, "ERC165Logic");
-        expect(await extensionAsEIP165.callStatic.supportsInterface(RETRACT.INTERFACE)).to.be.true;
-    });
-
-    it("should return interfaceId correctly", async function () {
-        expect(await retractLogic.callStatic.getImplementedInterfaces()).to.deep.equal([RETRACT.INTERFACE]);
-    });
-
-    it("should return interfaceId correctly", async function () {
-        expect(await retractLogic.callStatic.getFunctionSelectors()).to.deep.equal([RETRACT.SELECTORS]);
     });
 });

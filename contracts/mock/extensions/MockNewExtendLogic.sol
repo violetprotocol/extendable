@@ -32,21 +32,51 @@ contract MockNewExtendLogic is IMockNewFunction, IExtendLogic, Extension {
     
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](2);
+
+        bytes4[] memory IExtendFunctions = new bytes4[](5);
+        IExtendFunctions[0] = IExtendLogic.extend.selector;
+        IExtendFunctions[1] = IExtendLogic.getCurrentInterface.selector;
+        IExtendFunctions[2] = IExtendLogic.getExtensionsInterfaceIds.selector;
+        IExtendFunctions[3] = IExtendLogic.getExtensionsFunctionSelectors.selector;
+        IExtendFunctions[4] = IExtendLogic.getExtensionAddresses.selector;
         interfaces[0] = Interface(
             type(IExtendLogic).interfaceId,
-            abi.decode(abi.encode([
-                IExtendLogic.extend.selector,
-                IExtendLogic.getCurrentInterface.selector,
-                IExtendLogic.getExtensionsInterfaceIds.selector,
-                IExtendLogic.getExtensionsFunctionSelectors.selector,
-                IExtendLogic.getExtensionAddresses.selector
-            ]), (bytes4[]))
+            IExtendFunctions
         );
+
+        bytes4[] memory IMockNewFunctionFunctions = new bytes4[](1);
+        IMockNewFunctionFunctions[0] = IMockNewFunction.randomNewFunction.selector;
         interfaces[1] = Interface(
             type(IMockNewFunction).interfaceId,
-            abi.decode(abi.encode([
-                IMockNewFunction.randomNewFunction.selector
-            ]), (bytes4[]))
+            IMockNewFunctionFunctions
+        );
+    }
+}
+
+interface IMockAlternative {
+    function extend(address extension) external;
+    function randomNewFunction() external;
+}
+
+contract MockAlternative is IMockAlternative, Extension {
+    function extend(address extension) override public {}
+
+    function randomNewFunction() override public {}
+
+    function getSolidityInterface() override public pure returns(string memory) {
+        return  "function extend(address extension) external;\n"
+                "function randomNewFunction() external;\n";
+    }
+    
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](2);
+        functions[0] = IMockAlternative.extend.selector;
+        functions[1] = IMockAlternative.randomNewFunction.selector;
+        interfaces[0] = Interface(
+            type(IMockAlternative).interfaceId,
+            functions
         );
     }
 }

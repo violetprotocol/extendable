@@ -17,12 +17,13 @@ contract MockNewReplaceLogic is IMockNewReplaceLogic, Extension {
     }
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](2);
+        functions[0] = IMockNewReplaceLogic.replace.selector;
+        functions[1] = IMockNewReplaceLogic.replaceWith.selector;
         interfaces[0] = Interface(
             type(IMockNewReplaceLogic).interfaceId,
-            abi.decode(abi.encode([
-                IMockNewReplaceLogic.replace.selector,
-                IMockNewReplaceLogic.replaceWith.selector
-            ]), (bytes4[]))
+            functions
         );
     }
 }

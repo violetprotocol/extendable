@@ -45,5 +45,5 @@ interface IExtension {
      * Excludes any functions either already described by other interface definitions
      * that are not developed on top of this backbone i.e. EIP-165, IExtension
     */
-    function getInterface() external pure returns(Interface[] memory interfaces);
+    function getInterface() external returns(Interface[] memory interfaces);
 }
