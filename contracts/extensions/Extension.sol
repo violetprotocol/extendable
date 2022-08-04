@@ -5,7 +5,6 @@ import "./IExtension.sol";
 import "../errors/Errors.sol";
 import "../utils/CallerContext.sol";
 import "../erc165/IERC165Logic.sol";
-import "hardhat/console.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    

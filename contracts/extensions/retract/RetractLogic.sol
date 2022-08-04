@@ -5,7 +5,6 @@ import "../Extension.sol";
 import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
-import "hardhat/console.sol";
 
 contract RetractLogic is RetractExtension {
     /**
