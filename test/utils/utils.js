@@ -3,17 +3,19 @@ const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect, assert } = chai;
-const {EXTEND_LOGIC_INTERFACE, singletonFactoryDeployer, singletonFactoryDeploymentTx, singletonFactoryAddress, factoryABI} = require("./constants");
+const {singletonFactoryDeployer, singletonFactoryDeploymentTx, singletonFactoryAddress, factoryABI, EXTEND} = require("./constants");
 
 const shouldInitialiseExtendableCorrectly = async (extendableAddress, extendLogicAddress) => {
     const extendable = await getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
-    expect(await extendable.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE]);
+    expect(await extendable.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
+    expect(await extendable.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
     expect(await extendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogicAddress]);
     expect(await extendable.callStatic.getCurrentInterface()).to.equal("".concat(
         "interface IExtended {\n",
         "function extend(address extension) external;\n",
         "function getCurrentInterface() external view returns(string memory);\n",
-        "function getExtensions() external view returns(bytes4[] memory);\n",
+        "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+        "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
         "function getExtensionAddresses() external view returns(address[] memory);\n",
         "}"
     ));

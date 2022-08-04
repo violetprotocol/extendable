@@ -3,7 +3,9 @@ const { ethers } = require("hardhat");
 const utils = require("./utils")
 const { 
     EXTEND_LOGIC_INTERFACE,
-    MOCK_INTERNAL_EXTENSION_INTERFACE
+    MOCK_INTERNAL_EXTENSION_INTERFACE,
+    MOCK_INTERNAL_EXTENSION,
+    EXTEND
 } = require("./constants")
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
@@ -46,13 +48,15 @@ describe("InternalExtension", function () {
         it("should extend with internal extension", async function () {
             const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
             await expect(extendableExtendLogic.extend(mockInternalExtension.address)).to.not.be.reverted;
-            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_INTERNAL_EXTENSION_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_INTERNAL_EXTENSION.INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_INTERNAL_EXTENSION.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockInternalExtension.address]);
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
-                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
                     "function callInternalFunction() external;\n",
                     "function internalFunction() external;\n",

@@ -24,16 +24,18 @@ contract MockDeepCallerContextLogic is IMockDeepCallerContextLogic, Extension {
     }
     
     function getSolidityInterface() override public pure returns(string memory) {
-        return  "function getDeepCurrentCaller() external returns(address);\n"
+        return  "function getDeepCallerStack() external returns(address[] memory);\n"
+                "function getDeepCurrentCaller() external returns(address);\n"
                 "function getDeepLastExternalCaller() external returns(address);\n";
     }
 
     function getInterface() override public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
         
-        bytes4[] memory functions = new bytes4[](2);
-        functions[0] = IMockDeepCallerContextLogic.getDeepCurrentCaller.selector;
-        functions[1] = IMockDeepCallerContextLogic.getDeepLastExternalCaller.selector;
+        bytes4[] memory functions = new bytes4[](3);
+        functions[0] = IMockDeepCallerContextLogic.getDeepCallerStack.selector;
+        functions[1] = IMockDeepCallerContextLogic.getDeepCurrentCaller.selector;
+        functions[2] = IMockDeepCallerContextLogic.getDeepLastExternalCaller.selector;
 
         interfaces[0] = Interface(
             type(IMockDeepCallerContextLogic).interfaceId,

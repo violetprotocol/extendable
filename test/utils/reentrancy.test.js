@@ -3,7 +3,9 @@ const { ethers } = require("hardhat");
 const utils = require("./utils")
 const { 
     EXTEND_LOGIC_INTERFACE,
-    MOCK_REENTRANCY_INTERFACE
+    MOCK_REENTRANCY_INTERFACE,
+    MOCK_REENTRANCY,
+    EXTEND
 } = require("./constants")
 const web3 = require("web3");
 const chai = require("chai");
@@ -46,13 +48,15 @@ describe("Re-entrancy Guard", function () {
         it("should extend extendable with guarded extension", async function () {
             const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableInternal.address, "ExtendLogic");
             await expect(extendableExtendLogic.extend(reentrancylogic.address)).to.not.be.reverted;
-            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_REENTRANCY_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_REENTRANCY.INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_REENTRANCY.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, reentrancylogic.address]);
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
-                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
                     "function atomic(address target) external;\n",
                     "function reatomic(address target) external;\n",
@@ -88,13 +92,15 @@ describe("Re-entrancy Guard", function () {
         it("should extend external extendable with guarded extension", async function () {
             const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableExternal.address, "ExtendLogic");
             await expect(extendableExtendLogic.extend(reentrancylogic.address)).to.not.be.reverted;
-            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_REENTRANCY_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_REENTRANCY.INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_REENTRANCY.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, reentrancylogic.address]);
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
-                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
                     "function atomic(address target) external;\n",
                     "function reatomic(address target) external;\n",

@@ -47,7 +47,7 @@ contract Extendable {
      * To change owner or ownership mode, your contract must be extended with the
      * PermissioningLogic extension, giving it access to permissioning management.
      */
-    constructor(address extendLogic, address) {
+    constructor(address extendLogic) {
         // wrap main constructor logic in pre/post fallback hooks for callstack registration
         _beforeFallback();
 
@@ -121,21 +121,15 @@ contract Extendable {
         _beforeFallback();
         ExtendableState storage state = ExtendableStorage._getState();
 
-        bool ok = false;
         // if an extension exists that matches in the functionsig
         if (state.extensionContracts[msg.sig] != address(0x0)) {
             // call it
             _delegate(state.extensionContracts[msg.sig]);
         } else {                                                 
-            // else cycle through all extensions to find it if exists
-            // this is not the preferred method for usage and only acts as a fallback
-            for (uint i = 0; i < state.implementedInterfaces.length; i++) {
-                ok = _delegate(state.extensionContracts[state.implementedInterfaces[i]]);
-                if (ok) break; // exit after first successful execution
-            }
+            // else revert
+            revert ExtensionNotImplemented();
         }
 
-        if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
         _afterFallback();
     }
 

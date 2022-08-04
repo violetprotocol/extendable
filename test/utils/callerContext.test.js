@@ -2,9 +2,9 @@ const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
 const utils = require("./utils")
 const { 
-    EXTEND_LOGIC_INTERFACE,
-    MOCK_CALLER_CONTEXT_INTERFACE,
-    MOCK_DEEP_CALLER_CONTEXT_INTERFACE
+    EXTEND,
+    MOCK_CALLER_CONTEXT,
+    MOCK_DEEP_CALLER_CONTEXT
 } = require("./constants")
 const chai = require("chai");
 const { solidity } = require("ethereum-waffle");
@@ -50,14 +50,17 @@ describe("CallerContext", function () {
         it("should extend with caller context", async function () {
             const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
             await expect(extendableExtendLogic.extend(mockCallerContext.address)).to.not.be.reverted;
-            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_CALLER_CONTEXT.INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_CALLER_CONTEXT.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address]);
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
-                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function getCallerStack() external returns(address[] memory);\n",
                     "function getCurrentCaller() external returns(address);\n",
                     "function getLastExternalCaller() external returns(address);\n",
                 "}"
@@ -67,16 +70,21 @@ describe("CallerContext", function () {
         it("should extend with deep caller context", async function () {
             const extendableExtendLogic = await utils.getExtendedContractWithInterface(extendableAddress, "ExtendLogic");
             await expect(extendableExtendLogic.extend(mockDeepCallerContext.address)).to.not.be.reverted;
-            expect(await extendableExtendLogic.callStatic.getExtensions()).to.deep.equal([EXTEND_LOGIC_INTERFACE, MOCK_CALLER_CONTEXT_INTERFACE, MOCK_DEEP_CALLER_CONTEXT_INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_CALLER_CONTEXT.INTERFACE, MOCK_DEEP_CALLER_CONTEXT.INTERFACE]);
+            expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_CALLER_CONTEXT.SELECTORS, ...MOCK_DEEP_CALLER_CONTEXT.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
+            console.log(await mockDeepCallerContext.callStatic.getSolidityInterface());
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
                     "function getCurrentInterface() external view returns(string memory);\n",
-                    "function getExtensions() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                    "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
+                    "function getCallerStack() external returns(address[] memory);\n",
                     "function getCurrentCaller() external returns(address);\n",
                     "function getLastExternalCaller() external returns(address);\n",
+                    "function getDeepCallerStack() external returns(address[] memory);\n",
                     "function getDeepCurrentCaller() external returns(address);\n",
                     "function getDeepLastExternalCaller() external returns(address);\n",
                 "}"
