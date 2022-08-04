@@ -29,6 +29,7 @@ contract RetractLogic is RetractExtension {
 
         // Search for extension in interfaceIds
         uint256 numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        bool hasMatch;
 
         // we start with index 1 and reduce by one due to line 43 shortening the array
         // we need to decrement the counter if we shorten the array, but uint cannot be < 0
@@ -39,6 +40,7 @@ contract RetractLogic is RetractExtension {
 
             // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
+                hasMatch = true;
                 // Remove interface implementor
                 delete state.extensionContracts[interfaceId];
                 state.implementedInterfaces[decrementedIndex] = state.implementedInterfaces[numberOfInterfacesImplemented - 1];
@@ -55,6 +57,10 @@ contract RetractLogic is RetractExtension {
                 numberOfInterfacesImplemented--;
                 i--;
             }
+        }
+
+        if (!hasMatch) {
+            revert("Retract: specified extension is not an extension of this contract, cannot retract");
         }
     }
 }

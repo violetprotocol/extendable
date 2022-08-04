@@ -90,8 +90,8 @@ describe("RetractLogic", function () {
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address, replaceLogic.address]);
     });
 
-    it("retract with non-existent extension should not change state", async function () {
-        await expect(caller.callRetract(account.address)).to.not.be.reverted;
+    it("retract with non-existent extension should fail", async function () {
+        await expect(caller.callRetract(account.address)).to.be.revertedWith("Retract: specified extension is not an extension of this contract, cannot retract");
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, RETRACT.INTERFACE, REPLACE.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...RETRACT.SELECTORS, ...REPLACE.SELECTORS]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address, replaceLogic.address]);

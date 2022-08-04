@@ -24,8 +24,9 @@ const getExtendedContractWithInterface = async (address, interface) => {
     return (await LogicInterface.attach(address));
 }
 
-const checkExtensions = async (contract, expectedInterfaceIds, expectedContractAddresses) => {
-    expect(await contract.callStatic.getExtensions()).to.deep.equal(expectedInterfaceIds);
+const checkExtensions = async (contract, expectedInterfaceIds, expectedFunctionSelectors, expectedContractAddresses) => {
+    expect(await contract.callStatic.getExtensionsInterfaceIds()).to.deep.equal(expectedInterfaceIds);
+    expect(await contract.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(expectedFunctionSelectors);
     expect(await contract.callStatic.getExtensionAddresses()).to.deep.equal(expectedContractAddresses);
 }
 
