@@ -73,7 +73,6 @@ describe("CallerContext", function () {
             expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_CALLER_CONTEXT.INTERFACE, MOCK_DEEP_CALLER_CONTEXT.INTERFACE]);
             expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_CALLER_CONTEXT.SELECTORS, ...MOCK_DEEP_CALLER_CONTEXT.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
-            console.log(await mockDeepCallerContext.callStatic.getSolidityInterface());
             expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
