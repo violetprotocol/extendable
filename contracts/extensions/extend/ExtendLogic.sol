@@ -62,6 +62,8 @@ contract ExtendLogic is ExtendExtension {
 
         Interface[] memory interfaces = ext.getInterface();
         registerInterfaces(interfaces, extension);
+
+        emit Extended(extension);
     }
 
     /**

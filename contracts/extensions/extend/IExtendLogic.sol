@@ -9,12 +9,19 @@ import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorag
 */
 interface IExtendLogic {
     /**
+     * @dev Emitted when `extension` is successfully extended
+     */
+    event Extended(address extension);
+
+    /**
      * @dev Extend function to extend your extendable contract with new logic
      *
      * Integrate with ExtendableStorage to persist state
      *
      * Sets the known implementor of each function of `extension` as the current call context
      * contract.
+     *
+     * Emits `Extended` event upon successful extending.
      *
      * Requirements:
      *  - `extension` contract must implement EIP-165.

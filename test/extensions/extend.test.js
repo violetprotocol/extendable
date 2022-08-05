@@ -61,7 +61,8 @@ describe("ExtendLogic", function () {
     });
 
     it("extend should succeed", async function () {
-        await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: extendLogic.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);

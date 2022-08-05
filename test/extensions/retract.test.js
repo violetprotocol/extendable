@@ -63,21 +63,24 @@ describe("RetractLogic", function () {
     });
 
     it("extend should succeed", async function () {
-        await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: extendLogic.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
     });
 
     it("extend with retract should succeed", async function () {
-        await expect(caller.callExtend(retractLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callExtend(retractLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: retractLogic.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, RETRACT.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...RETRACT.SELECTORS]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address]);
     });
 
     it("extend with replace should succeed", async function () {
-        await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: replaceLogic.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, RETRACT.INTERFACE, REPLACE.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...RETRACT.SELECTORS, ...REPLACE.SELECTORS]);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, retractLogic.address, replaceLogic.address]);

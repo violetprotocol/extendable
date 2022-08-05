@@ -69,7 +69,8 @@ describe("ReplaceLogic", function () {
 
     describe("extend with replace", () => {
         it("extend should succeed", async function () {
-            await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: extendLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE],
@@ -79,7 +80,8 @@ describe("ReplaceLogic", function () {
         });
     
         it("extend with permissioning should succeed", async function () {
-            await expect(caller.callExtend(permissioningLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(permissioningLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: permissioningLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE, PERMISSIONING.INTERFACE], 
@@ -89,7 +91,8 @@ describe("ReplaceLogic", function () {
         });
     
         it("extend with replace should succeed", async function () {
-            await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: replaceLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE, PERMISSIONING.INTERFACE, REPLACE.INTERFACE], 
