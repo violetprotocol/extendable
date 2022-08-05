@@ -76,6 +76,7 @@ describe("PermissioningLogic", function () {
                 "function updateOwner(address newOwner) external;\n",
                 "function getOwner() external view returns(address);\n"
             ));
+        });
     });
 
     
