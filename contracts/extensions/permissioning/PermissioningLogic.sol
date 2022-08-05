@@ -53,7 +53,7 @@ contract PermissioningLogic is PermissioningExtension {
      * @dev see {IPermissioningLogic-renounceOwnership}
     */
     function renounceOwnership() override public onlyOwner {
-        address constant NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+        address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
         RoleState storage state = Permissions._getState();
         state.owner = NULL_ADDRESS;
     }

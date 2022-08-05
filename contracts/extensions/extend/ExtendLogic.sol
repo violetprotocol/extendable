@@ -70,9 +70,9 @@ contract ExtendLogic is ExtendExtension {
     function getCurrentInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
 
-        uint interfaceIdsLength = state.interfaceIds.length;
-        for (uint i = 0; i < interfaceIdsLength; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        uint numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = state.implementedInterfaces[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
             fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
         }

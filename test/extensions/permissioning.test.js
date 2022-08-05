@@ -74,6 +74,7 @@ describe("PermissioningLogic", function () {
             expect(await logic.callStatic.getSolidityInterface()).to.equal("".concat(
                 "function init() external;\n",
                 "function updateOwner(address newOwner) external;\n",
+                "function renounceOwnership() external;\n",
                 "function getOwner() external view returns(address);\n"
             ));
         });

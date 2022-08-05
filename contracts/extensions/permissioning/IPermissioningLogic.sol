@@ -45,6 +45,7 @@ abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     function getSolidityInterface() override public pure returns(string memory) {
         return  "function init() external;\n"
                 "function updateOwner(address newOwner) external;\n"
+                "function renounceOwnership() external;\n"
                 "function getOwner() external view returns(address);\n";
     }
 
@@ -54,10 +55,11 @@ abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     function getInterface() override public returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
 
-        bytes4[] memory functions = new bytes4[](3);
+        bytes4[] memory functions = new bytes4[](4);
         functions[0] = IPermissioningLogic.init.selector;
         functions[1] = IPermissioningLogic.updateOwner.selector;
-        functions[2] = IPermissioningLogic.getOwner.selector;
+        functions[2] = IPermissioningLogic.renounceOwnership.selector;
+        functions[3] = IPermissioningLogic.getOwner.selector;
 
         interfaces[0] = Interface(
             type(IPermissioningLogic).interfaceId,

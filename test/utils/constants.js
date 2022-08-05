@@ -19,10 +19,11 @@ module.exports = {
         ]
     },
     PERMISSIONING: {
-        INTERFACE: "0xe0f6c5f3",
+        INTERFACE: "0x91a6dd55",
         SELECTORS: [
             "0xe1c7392a",
             "0x880cdc31",
+            "0x715018a6",
             "0x893d20e8"
         ]
     },
