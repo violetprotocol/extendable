@@ -22,7 +22,6 @@ contract PermissioningLogic is PermissioningExtension {
      * @dev see {Extension-constructor} for constructor
     */
 
-
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
@@ -45,8 +44,18 @@ contract PermissioningLogic is PermissioningExtension {
      * @dev see {IPermissioningLogic-updateOwner}
     */
     function updateOwner(address newOwner) override public onlyOwner {
+        require(newOwner != address(0x0), "new owner cannot be the zero address");
         RoleState storage state = Permissions._getState();
         state.owner = newOwner;
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-renounceOwnership}
+    */
+    function renounceOwnership() override public onlyOwner {
+        address constant NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+        RoleState storage state = Permissions._getState();
+        state.owner = NULL_ADDRESS;
     }
 
     /**
