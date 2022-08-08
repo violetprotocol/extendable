@@ -43,8 +43,9 @@ describe("RetractLogic", function () {
         await caller.deployed();
     })
 
-    it("deployment should have initialised permissioning", async function () {
-        expect(await caller.callStatic.getOwner(permissioningLogic.address)).to.equal(account.address);
+    it("initialise permissioning", async function () {
+        await expect(caller.init()).to.not.be.reverted;
+        expect(await caller.callStatic.getOwner()).to.equal(account.address);
     });
 
     it("should register interface id during constructor correctly", async function () {

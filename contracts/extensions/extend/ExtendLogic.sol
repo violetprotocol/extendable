@@ -6,7 +6,9 @@ import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 import "../../erc165/IERC165Logic.sol";
+import "../permissioning/IPermissioningLogic.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "hardhat/console.sol";
 
 /**
  * @dev Reference implementation for ExtendLogic which defines the logic to extend
@@ -140,6 +142,7 @@ contract ExtendLogic is ExtendExtension {
         // Set the owner to the transaction sender if owner has not been initialised
         if (state.owner == address(0x0)) {
             state.owner = _lastCaller();
+            emit OwnerInitialised(_lastCaller());
         }
     }
 

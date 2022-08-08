@@ -12,6 +12,11 @@ interface IExtendLogic {
      * @dev Emitted when `extension` is successfully extended
      */
     event Extended(address extension);
+    
+    /**
+     * @dev Emitted when extend() is called and contract owner has not been set
+     */
+    event OwnerInitialised(address newOwner);
 
     /**
      * @dev Extend function to extend your extendable contract with new logic

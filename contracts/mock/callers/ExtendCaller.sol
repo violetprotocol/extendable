@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "../../errors/Errors.sol";
-import "../../extensions/permissioning/PermissioningLogic.sol";
+import "./PermissioningCaller.sol";
 import "./Revert.sol";
 
 /**
@@ -10,20 +10,11 @@ import "./Revert.sol";
  * 
  * Tests ExtendLogic without Extendable.sol as standalone unit
  */
-contract ExtendCaller {
+contract ExtendCaller is PermissioningCaller {
     address internal _extendLogic;
 
-    constructor(address permissioninglogic, address extendLogic) {
-        (bool success, ) = permissioninglogic.delegatecall(abi.encodeWithSignature("init()"));
-        Revert.require(success);
+    constructor(address permissioningLogic, address extendLogic) PermissioningCaller(permissioningLogic) {
         _extendLogic = extendLogic;
-    }
-
-    function getOwner(address permissioninglogic) public returns(address owner) {
-        (bool success, bytes memory result) = permissioninglogic.delegatecall(abi.encodeWithSignature("getOwner()"));
-        Revert.require(success);
-        owner = abi.decode(result, (address));
-        return(owner);
     }
 
     function callExtend(address extension) public {
