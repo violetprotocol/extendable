@@ -7,6 +7,8 @@ import "../Extension.sol";
  * @dev Interface for PermissioningLogic extension
 */
 interface IPermissioningLogic {
+    event OwnerUpdated(address oldOwner, address newOwner);
+
     /**
      * @dev Initialises the `owner` of the contract as `msg.sender`
      *

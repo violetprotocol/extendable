@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const chai = require("chai");
 const { PERMISSIONING } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
-const { getExtendedContractWithInterface } = require("../utils/utils");
+const { getExtendedContractWithInterface, expectEvent } = require("../utils/utils");
 chai.use(solidity);
 const { expect } = chai;
 
@@ -20,18 +20,19 @@ describe("PermissioningLogic", function () {
     });
 
     it("initialise permissioning should succeed", async function () {
-        await expect(logic.init()).to.not.be.reverted;
+        const tx = await expect(logic.init()).to.not.be.reverted;
+        await expectEvent(tx, logic.interface, "OwnerUpdated", { oldOwner: ethers.constants.AddressZero, newOwner: account.address });
         expect(await logic.callStatic.getOwner()).to.equal(account.address);
     });
 
     describe("After init", function () {
         beforeEach("deploy new", async function () {
-            await expect(logic.init()).to.not.be.reverted;
+            await expect(logic.init()).to.emit(logic, "OwnerUpdated").withArgs(ethers.constants.AddressZero, account.address);
             expect(await logic.callStatic.getOwner()).to.equal(account.address);
         });
 
         it("update owner should succeed", async function () {
-            await expect(logic.updateOwner(account2.address)).to.not.be.reverted;
+            await expect(logic.updateOwner(account2.address)).to.emit(logic, "OwnerUpdated").withArgs(account.address, account2.address);
             expect(await logic.callStatic.getOwner()).to.equal(account2.address);
         });
     
@@ -46,8 +47,8 @@ describe("PermissioningLogic", function () {
         });
     
         it("update owner to original owner should succeed", async function () {
-            await logic.updateOwner(account2.address);
-            await expect(logic.connect(account2).updateOwner(account.address)).to.not.be.reverted;
+            await expect(logic.updateOwner(account2.address)).to.emit(logic, "OwnerUpdated").withArgs(account.address, account2.address);
+            await expect(logic.connect(account2).updateOwner(account.address)).to.emit(logic, "OwnerUpdated").withArgs(account2.address, account.address);
             expect(await logic.callStatic.getOwner()).to.equal(account.address);
         });
     
@@ -57,7 +58,7 @@ describe("PermissioningLogic", function () {
         });
 
         it("renouncing ownership should set owner to the null address", async function () {
-            await expect(logic.renounceOwnership()).to.not.be.reverted;
+            await expect(logic.renounceOwnership()).to.emit(logic, "OwnerUpdated").withArgs(account.address, NULL_ADDRESS);
             expect(await logic.callStatic.getOwner()).to.equal(NULL_ADDRESS);
         });
 
