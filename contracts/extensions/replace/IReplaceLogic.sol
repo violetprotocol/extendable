@@ -8,6 +8,11 @@ import "../Extension.sol";
 */
 interface IReplaceLogic {
     /**
+     * @dev Emitted when `extension` is successfully extended
+     */
+    event Replaced(address oldExtension, address newExtension);
+
+    /**
      * @dev Replaces `oldExtension` with `newExtension`
      *
      * Performs consecutive execution of retract and extend.

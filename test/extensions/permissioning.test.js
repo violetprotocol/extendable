@@ -107,7 +107,6 @@ describe("PermissioningLogic", function () {
 
         it("update owner should succeed", async function () {
             await expect(caller.init()).to.not.be.reverted;
-            console.log(await caller.callStatic.getOwner());
             const tx = await expect(caller.updateOwner(account2.address)).to.not.be.reverted;
             await expectEvent(tx, logic.interface, "OwnerUpdated", { oldOwner: account.address, newOwner: account2.address });
             expect(await caller.callStatic.getOwner()).to.equal(account2.address);

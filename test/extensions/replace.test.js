@@ -241,8 +241,9 @@ describe("ReplaceLogic", function () {
 });
 
 const replace = async (caller, oldExtension, newExtension, expectedInterfaceIds, expectedFunctionSelectors, expectedContractAddresses, revertMessage = false) => {
+    let tx;
     if (revertMessage !== false) await expect(caller.callReplace(oldExtension, newExtension)).to.be.revertedWith(revertMessage);
-    else await expect(caller.callReplace(oldExtension, newExtension)).to.not.be.reverted;
+    else tx = await expect(caller.callReplace(oldExtension, newExtension)).to.not.be.reverted;
 
     await utils.checkExtensions(
         caller, 
@@ -250,4 +251,6 @@ const replace = async (caller, oldExtension, newExtension, expectedInterfaceIds,
         expectedFunctionSelectors,
         expectedContractAddresses
     );
+    const contract = await utils.getExtendedContractWithInterface(caller.address, "ReplaceLogic");
+    if (tx) await utils.expectEvent(tx, contract.interface, "Replaced", { oldExtension, newExtension });
 }
