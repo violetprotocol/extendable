@@ -102,7 +102,8 @@ describe("RetractLogic", function () {
     });
 
     it("retract should succeed", async function () {
-        await expect(caller.callRetract(extendLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callRetract(extendLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, retractLogic.interface, "Retracted", { extension: extendLogic.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([REPLACE.INTERFACE, RETRACT.INTERFACE]);
     });
 });

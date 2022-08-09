@@ -61,5 +61,7 @@ contract RetractLogic is RetractExtension {
         if (!hasMatch) {
             revert("Retract: specified extension is not an extension of this contract, cannot retract");
         }
+
+        emit Retracted(extension);
     }
 }

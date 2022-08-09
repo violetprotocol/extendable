@@ -9,6 +9,11 @@ import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorag
 */
 interface IRetractLogic {
     /**
+     * @dev Emitted when `extension` is successfully removed
+     */
+    event Retracted(address extension);
+
+    /**
      * @dev Removes an extension from your Extendable contract
      *
      * Requirements:
