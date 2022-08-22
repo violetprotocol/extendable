@@ -50,7 +50,7 @@ describe("ExtendLogic", function () {
         expect(await extendLogic.callStatic.getInterface()).to.deep.equal([[EXTEND.INTERFACE, EXTEND.SELECTORS]]);
     });
 
-    it("should return implemented interfaces correctly", async function () {
+    it("should return solidity interface correctly", async function () {
         expect(await extendLogic.callStatic.getSolidityInterface()).to.equal("".concat(
             "function extend(address extension) external;\n",
             "function getCurrentInterface() external view returns(string memory);\n",
