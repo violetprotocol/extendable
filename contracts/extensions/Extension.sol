@@ -31,10 +31,11 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     constructor() {
         Interface[] memory interfaces = getInterface();
         for (uint256 i = 0; i < interfaces.length; i++) {
-            registerInterface(interfaces[i].interfaceId);
+            Interface memory iface = interfaces[i];
+            registerInterface(iface.interfaceId);
 
-            for (uint256 j = 0; j < interfaces[i].functions.length; j++) {
-                registerInterface(interfaces[i].functions[j]);
+            for (uint256 j = 0; j < iface.functions.length; j++) {
+                registerInterface(iface.functions[j]);
             }
         }
 
@@ -42,7 +43,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function supportsInterface(bytes4 interfaceId) external override virtual returns(bool) {
-        address ERC165Logic = address(0x99576C1caF6bFc959a1190418027E6F09380d384);
+        address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
         if (!success) {
@@ -55,7 +56,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function registerInterface(bytes4 interfaceId) public override virtual {
-        address ERC165Logic = address(0x99576C1caF6bFc959a1190418027E6F09380d384);
+        address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
         (bool success, ) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
         if (!success) {
