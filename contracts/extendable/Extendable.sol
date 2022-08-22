@@ -124,11 +124,8 @@ contract Extendable {
             // call it
             _delegate(state.extensionContracts[msg.sig]);
         } else {                                                 
-            // else revert
             revert ExtensionNotImplemented();
         }
-
-        _afterFallback();
     }
 
     /**
