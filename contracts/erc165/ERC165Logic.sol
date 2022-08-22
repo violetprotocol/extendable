@@ -7,6 +7,8 @@ import { ERC165State, ERC165Storage } from "../storage/ERC165Storage.sol";
 /**
  * @dev Standalone implementation of a global ERC165 interface detector.
  *
+ * Deployed as singleton using EIP-2470: https://eips.ethereum.org/EIPS/eip-2470
+ *
  * Provides ERC165 functionalities to any contract without it needing to
  * implement ERC165 itself.
  * 

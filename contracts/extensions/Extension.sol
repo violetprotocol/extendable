@@ -18,6 +18,9 @@ import "../erc165/IERC165Logic.sol";
  *  Inherit and implement this contract to create Extension contracts!
  *
  *  Implements the EIP-165 standard for interface detection of implementations during runtime.
+ *  Uses the ERC165 singleton pattern where the actual implementation logic of the interface is
+ *  deployed in a separate contract. See ERC165Logic. Deterministic deployment guarantees the
+ *  ERC165Logic contract to always exist as static address 0x16C940672fA7820C36b2123E657029d982629070
  *
  *  Define your custom Extension interface and implement it whilst inheriting this contract:
  *      contract YourExtension is IYourExtension, Extension {...}
@@ -43,6 +46,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function supportsInterface(bytes4 interfaceId) external override virtual returns(bool) {
+        // Static address for the ERC165Logic
         address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
         (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
@@ -56,6 +60,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function registerInterface(bytes4 interfaceId) public override virtual {
+        // Static address for the ERC165Logic
         address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
         (bool success, ) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
