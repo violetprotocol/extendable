@@ -43,7 +43,7 @@ contract ERC165Logic is IERC165, IERC165Register {
      * `interfaceId`. Support of the actual ERC165 interface is automatic and
      * registering its interface id is not required.
      *
-     * See {IERC165-supportsInterface}.
+     * See {IERC165Register-registerInterface}.
      *
      * Requirements:
      *
