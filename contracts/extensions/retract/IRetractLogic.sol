@@ -21,14 +21,14 @@ abstract contract RetractExtension is IRetractLogic, Extension {
     /**
      * @dev see {IExtension-getSolidityInterface}
     */
-    function getSolidityInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override virtual public pure returns(string memory) {
         return  "function retract(address extension) external;\n";
     }
 
     /**
      * @dev see {IExtension-getImplementedInterfaces}
     */
-    function getInterface() override public pure returns(Interface[] memory interfaces) {
+    function getInterface() override virtual public pure returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
 
         bytes4[] memory functions = new bytes4[](1);

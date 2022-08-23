@@ -42,7 +42,7 @@ abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     /**
      * @dev see {IExtension-getSolidityInterface}
     */
-    function getSolidityInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override virtual public pure returns(string memory) {
         return  "function init() external;\n"
                 "function updateOwner(address newOwner) external;\n"
                 "function renounceOwnership() external;\n"
@@ -52,7 +52,7 @@ abstract contract PermissioningExtension is IPermissioningLogic, Extension {
     /**
      * @dev see {IExtension-getInterface}
     */
-    function getInterface() override public returns(Interface[] memory interfaces) {
+    function getInterface() override virtual public returns(Interface[] memory interfaces) {
         interfaces = new Interface[](1);
 
         bytes4[] memory functions = new bytes4[](4);
