@@ -28,7 +28,7 @@ interface IExtendLogic {
      * @dev Returns a string-formatted representation of the full interface of the current
      *      Extendable contract as an interface named IExtended
      *
-     * Expects `extension.getInterface` to return interface-compatible syntax with line-separated
+     * Expects `extension.getSolidityInterface` to return interface-compatible syntax with line-separated
      * function declarations including visibility, mutability and returns.
     */
     function getCurrentInterface() external view returns(string memory fullInterface);
