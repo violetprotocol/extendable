@@ -17,13 +17,10 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
  * to only `owner`. Uses a common function from the storage library `_onlyOwner()` as a
  * modifier replacement. Can be wrapped in a modifier if preferred.
 */
-contract PermissioningLogic is IPermissioningLogic, Extension {
-    address constant NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
-
+contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
-
 
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
@@ -56,6 +53,7 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {IPermissioningLogic-renounceOwnership}
     */
     function renounceOwnership() override public onlyOwner {
+        address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
         RoleState storage state = Permissions._getState();
         state.owner = NULL_ADDRESS;
     }
@@ -66,22 +64,5 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
     function getOwner() override public view returns(address) {
         RoleState storage state = Permissions._getState();
         return(state.owner);
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IPermissioningLogic).interfaceId);
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function init() external;\n"
-                "function updateOwner(address newOwner) external;\n"
-                "function renounceOwnership() external;\n"
-                "function getOwner() external view returns(address);\n";
     }
 }

@@ -11,7 +11,7 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 // Requires the Extendable to have been extended with both ExtendLogic and RetractLogic
 // Only allows replacement of extensions that share the exact same interface
 // Safest ReplaceLogic extension
-contract StrictReplaceLogic is IReplaceLogic, Extension {
+contract StrictReplaceLogic is ReplaceExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -37,7 +37,26 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
 
         IExtension old = IExtension(payable(oldExtension));
         IExtension newEx = IExtension(payable(newExtension));
-        require(newEx.getInterfaceId() == old.getInterfaceId(), "Replace: interface of new does not match old, please only use identical interfaces");
+
+        Interface[] memory oldInterfaces = old.getInterface();
+        Interface[] memory newInterfaces = newEx.getInterface();
+
+        // require the interfaceIds implemented by the old extension is equal to the new one
+        bytes4 oldFullInterface = oldInterfaces[0].interfaceId;
+        bytes4 newFullInterface = newInterfaces[0].interfaceId;
+
+        for (uint256 i = 1; i < oldInterfaces.length; i++) {
+            oldFullInterface = oldFullInterface ^ oldInterfaces[i].interfaceId;
+        }
+
+        for (uint256 i = 1; i < newInterfaces.length; i++) {
+            newFullInterface = newFullInterface ^ newInterfaces[i].interfaceId;
+        }
+        
+        require(
+            newFullInterface == oldFullInterface, 
+            "Replace: interface of new does not match old, please only use identical interfaces"
+        );
 
         // Initialise both prior to state change for safety
         IRetractLogic retractLogic = IRetractLogic(payable(address(this)));
@@ -63,20 +82,5 @@ contract StrictReplaceLogic is IReplaceLogic, Extension {
                 }
             }
         }
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return (type(IReplaceLogic).interfaceId);
-    }
-
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;\n";
     }
 }

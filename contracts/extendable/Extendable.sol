@@ -110,8 +110,6 @@ contract Extendable {
      *
      * Initially attempts to locate an interfaceId match with a function selector
      * which are extensions that house single functions (singleton extensions)
-     * If none is found then attempt execution by cycling through extensions and
-     * calling.
      *
      * If no implementations are found that match the requested function signature,
      * returns ExtensionNotImplemented error
@@ -124,15 +122,8 @@ contract Extendable {
             // call it
             _delegate(state.extensionContracts[msg.sig]);
         } else {                                                 
-            // else cycle through all extensions to find it if exists
-            // this is not the preferred method for usage and only acts as a fallback
-            uint interfaceIdsLength = state.interfaceIds.length;
-            for (uint i = 0; i < interfaceIdsLength; i++) {
-                _delegate(state.extensionContracts[state.interfaceIds[i]]);
-            }
+            revert ExtensionNotImplemented();
         }
-
-        revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
     }
 
     /**

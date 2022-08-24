@@ -5,7 +5,8 @@ import "../Extension.sol";
 import "./IExtendLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
-import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import "../../erc165/IERC165Logic.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /**
  * @dev Reference implementation for ExtendLogic which defines the logic to extend
@@ -17,7 +18,7 @@ import "@openzeppelin/contracts/utils/introspection/IERC165.sol";
  * Modify this ExtendLogic extension to change the way that your contract can be
  * extended: public extendability; DAO-based extendability; governance-vote-based etc.
 */
-contract ExtendLogic is IExtendLogic, Extension {
+contract ExtendLogic is ExtendExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -38,36 +39,42 @@ contract ExtendLogic is IExtendLogic, Extension {
      *
      * Uses PermissioningLogic implementation with `owner` checks.
      *
-     * Restricts extend to `onlyOwner`.
+     * Restricts extend to `onlyOwnerOrSelf`.
      *
      * If `owner` has not been initialised, assume that this is the initial extend call
      * during constructor of Extendable and instantiate `owner` as the caller.
+     *
+     * If any single function in the extension has already been extended by another extension,
+     * revert the transaction.
     */
     function extend(address extension) override public virtual onlyOwnerOrSelf {
         require(extension.code.length > 0, "Extend: address is not a contract");
 
-        IERC165 erc165Extension = IERC165(payable(extension));
-        require(erc165Extension.supportsInterface(bytes4(0x01ffc9a7)), "Extend: extension does not implement eip-165");
+        IERC165 erc165Extension = IERC165(extension);
+        try erc165Extension.supportsInterface(bytes4(0x01ffc9a7)) returns(bool erc165supported) {
+            require(erc165supported, "Extend: extension does not implement eip-165");
+            require(erc165Extension.supportsInterface(type(IExtension).interfaceId), "Extend: extension does not implement IExtension");
+        } catch (bytes memory) {
+            revert("Extend: extension does not implement eip-165");
+        }
 
         IExtension ext = IExtension(payable(extension));
-        ExtendableState storage state = ExtendableStorage._getState();
-        require(state.extensionContracts[ext.getInterfaceId()] == address(0x0), "Extend: extension already exists for interfaceId");
 
-        state.interfaceIds.push(ext.getInterfaceId());
-        state.extensionContracts[ext.getInterfaceId()] = extension;
+        Interface[] memory interfaces = ext.getInterface();
+        registerInterfaces(interfaces, extension);
     }
 
     /**
-     * @dev see {IExtendLogic-getCurrentInterface}
+     * @dev see {IExtendLogic-getFullInterface}
     */
-    function getCurrentInterface() override public view returns(string memory fullInterface) {
+    function getFullInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
 
-        uint interfaceIdsLength = state.interfaceIds.length;
-        for (uint i = 0; i < interfaceIdsLength; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
-            fullInterface = string(abi.encodePacked(fullInterface, logic.getInterface()));
+            fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
         }
 
         // TO-DO optimise this return to a standardised format with comments for developers
@@ -75,11 +82,34 @@ contract ExtendLogic is IExtendLogic, Extension {
     }
 
     /**
-     * @dev see {IExtendLogic-getExtensions}
+     * @dev see {IExtendLogic-getExtensionsInterfaceIds}
     */
-    function getExtensions() override public view returns(bytes4[] memory) {
+    function getExtensionsInterfaceIds() override public view returns(bytes4[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        return state.interfaceIds;
+        return state.implementedInterfaceIds;
+    }
+
+    /**
+     * @dev see {IExtendLogic-getExtensionsFunctionSelectors}
+    */
+    function getExtensionsFunctionSelectors() override public view returns(bytes4[] memory functionSelectors) {
+        ExtendableState storage state = ExtendableStorage._getState();
+        bytes4[] storage implementedInterfaces = state.implementedInterfaceIds;
+        
+        uint256 numberOfFunctions = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+                numberOfFunctions += state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+        }
+
+        functionSelectors = new bytes4[](numberOfFunctions);
+        uint256 counter = 0;
+        for (uint256 i = 0; i < implementedInterfaces.length; i++) {
+            uint256 functionNumber = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]].length;
+            for (uint256 j = 0; j < functionNumber; j++) {
+                functionSelectors[counter] = state.implementedFunctionsByInterfaceId[implementedInterfaces[i]][j];
+                counter++;
+            }
+        }
     }
 
     /**
@@ -87,34 +117,14 @@ contract ExtendLogic is IExtendLogic, Extension {
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        uint interfaceIdsLength = state.interfaceIds.length;
-
-        address[] memory addresses = new address[](interfaceIdsLength);
-
-        for (uint i = 0; i < interfaceIdsLength; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        address[] memory addresses = new address[](state.implementedInterfaceIds.length);
+        
+        for (uint i = 0; i < state.implementedInterfaceIds.length; i++) {
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
             addresses[i] = state.extensionContracts[interfaceId];
         }
         return addresses;
     }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function extend(address extension) external;\n"
-                "function getCurrentInterface() external view returns(string memory);\n"
-                "function getExtensions() external view returns(bytes4[] memory);\n"
-                "function getExtensionAddresses() external view returns(address[] memory);\n";
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IExtendLogic).interfaceId);
-    }
-
 
     /**
      * @dev Sets the owner of the contract to the tx origin if unset
@@ -128,6 +138,44 @@ contract ExtendLogic is IExtendLogic, Extension {
         // Set the owner to the transaction sender if owner has not been initialised
         if (state.owner == address(0x0)) {
             state.owner = _lastCaller();
+        }
+    }
+
+    function registerInterfaces(Interface[] memory interfaces, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each interface as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfInterfacesImplemented = interfaces.length;
+        for (uint256 i = 0; i < numberOfInterfacesImplemented; i++) {
+            bytes4 interfaceId = interfaces[i].interfaceId;
+            address implementer = state.extensionContracts[interfaceId];
+
+            require(
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaceId)), 4)," is already implemented by ", Strings.toHexString(implementer)))
+            );
+
+            registerFunctions(interfaceId, interfaces[i].functions, extension);
+            state.extensionContracts[interfaceId] = extension;
+            state.implementedInterfaceIds.push(interfaceId);
+        }
+    }
+
+    function registerFunctions(bytes4 interfaceId, bytes4[] memory functionSelectors, address extension) internal {
+        ExtendableState storage state = ExtendableStorage._getState();
+
+        // Record each function as implemented by new extension, revert if a function is already implemented by another extension
+        uint256 numberOfFunctions = functionSelectors.length;
+        for (uint256 i = 0; i < numberOfFunctions; i++) {
+            address implementer = state.extensionContracts[functionSelectors[i]];
+
+            require(
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functionSelectors[i])), 4)," is already implemented by ", Strings.toHexString(implementer)))
+            );
+
+            state.extensionContracts[functionSelectors[i]] = extension;
+            state.implementedFunctionsByInterfaceId[interfaceId].push(functionSelectors[i]);
         }
     }
 }

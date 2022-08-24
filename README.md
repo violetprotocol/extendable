@@ -49,7 +49,7 @@ All contracts must inherit the _Extendable_ contract.
 
 _Extendable_ contracts have a unique interaction with the _ExtendLogic_ contract where Extensions are added. _Extendable_ contracts access the state written by the _ExtendLogic_ extension in order to perform delegate calls to each extension. All calls are done from the context of the _Extendable_ contract which is handled by `delegatecall`.
 
-_Extendable_ contracts have an evolving interface which is accessible through the `getCurrentInterface` function supplied by the _ExtendLogic_ extension. This allows developers to easily determine the current interface of an evolving _Extendable_ contract directly on-chain without having to query separate processes that may not be in sync (GitHub, Documentation, Twitter etc.).
+_Extendable_ contracts have an evolving interface which is accessible through the `getFullInterface` function supplied by the _ExtendLogic_ extension. This allows developers to easily determine the current interface of an evolving _Extendable_ contract directly on-chain without having to query separate processes that may not be in sync (GitHub, Documentation, Twitter etc.).
 
 ### Extensions
 

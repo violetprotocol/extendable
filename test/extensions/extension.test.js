@@ -1,24 +1,24 @@
-const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const web3 = require("web3");
 const chai = require("chai");
 const {
     BASE_EXTENSION_INTERFACE,
     EIP165_INTERFACE,
-    MOCK_LOGIC_INTERFACE
+    MOCK_EXTENSION
 } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
+const { getExtendedContractWithInterface } = require("../utils/utils");
 chai.use(solidity);
-const { expect, assert } = chai;
+const { expect } = chai;
 
 describe("Extension", function () {
     let account;
     let extension;
     let caller;
+    let extensionAsEIP165;
 
     before("deploy new", async function () {
-        [account] = await ethers.getSigners();
-
+        [account, account2] = await ethers.getSigners();
+        
         const Extension = await ethers.getContractFactory("MockExtension");
         const Caller = await ethers.getContractFactory("MockExtensionCaller");
 
@@ -27,6 +27,8 @@ describe("Extension", function () {
 
         await extension.deployed();
         await caller.deployed();
+
+        extensionAsEIP165 = await getExtendedContractWithInterface(extension.address, "ERC165Logic");
     })
 
     it("call test function should succeed", async function () {
@@ -41,25 +43,25 @@ describe("Extension", function () {
         await expect(extension.reverts()).to.be.revertedWith('normal reversion');
     });
 
-    it("should implement EIP-165 correctly", async function () {
-        expect(await extension.callStatic.supportsInterface(EIP165_INTERFACE)).to.be.true;
+    it("should integrate with EIP-165 correctly", async function () {
+        expect(await extensionAsEIP165.callStatic.supportsInterface(EIP165_INTERFACE)).to.be.true;
     });
 
     it("should implement IExtension correctly", async function () {
-        expect(await extension.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
+        expect(await extensionAsEIP165.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
     });
 
     it("should register extension interface id during constructor correctly", async function () {
-        expect(await extension.callStatic.supportsInterface(MOCK_LOGIC_INTERFACE)).to.be.true;
-        expect(await extension.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
+        expect(await extensionAsEIP165.callStatic.supportsInterface(MOCK_EXTENSION.INTERFACE)).to.be.true;
+        expect(await extensionAsEIP165.callStatic.supportsInterface(BASE_EXTENSION_INTERFACE)).to.be.true;
     });
 
-    it("should return interfaceId correctly", async function () {
-        expect(await extension.callStatic.getInterfaceId()).to.equal(MOCK_LOGIC_INTERFACE);
+    it("should return implemented interfaces correctly", async function () {
+        expect(await extension.callStatic.getInterface()).to.deep.equal([[MOCK_EXTENSION.INTERFACE, MOCK_EXTENSION.SELECTORS]]);
     });
 
-    it("should return verbose extension interface correctly", async function () {
-        expect(await extension.callStatic.getInterface()).to.equal("".concat(
+    it("should return solidity interface correctly", async function () {
+        expect(await extension.callStatic.getSolidityInterface()).to.equal("".concat(
             "function test() external;\n",
             "function reverts() external;\n"
         ));

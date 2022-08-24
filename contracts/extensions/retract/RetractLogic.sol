@@ -6,7 +6,7 @@ import "./IRetractLogic.sol";
 import {ExtendableState, ExtendableStorage} from "../../storage/ExtendableStorage.sol";
 import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
 
-contract RetractLogic is IRetractLogic, Extension {
+contract RetractLogic is RetractExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -23,42 +23,43 @@ contract RetractLogic is IRetractLogic, Extension {
     /**
      * @dev see {IRetractLogic-retract}
     */
-    function retract(address extension) override public virtual onlyOwnerOrSelf {
+    function retract(address extension) override external virtual onlyOwnerOrSelf {
         ExtendableState storage state = ExtendableStorage._getState();
 
         // Search for extension in interfaceIds
-        uint interfaceIdsLength = state.interfaceIds.length;
-        for (uint i = 0; i < interfaceIdsLength; i++) {
-            bytes4 interfaceId = state.interfaceIds[i];
+        uint256 numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+        bool hasMatch;
+
+        // we start with index 1 and reduce by one due to line 43 shortening the array
+        // we need to decrement the counter if we shorten the array, but uint cannot be < 0
+        for (uint i = 1; i < numberOfInterfacesImplemented + 1; i++) {
+            uint256 decrementedIndex = i - 1;
+            bytes4 interfaceId = state.implementedInterfaceIds[decrementedIndex];
             address currentExtension = state.extensionContracts[interfaceId];
 
             // Check if extension matches the one we are looking for
             if (currentExtension == extension) {
-                // Remove from mapping
+                hasMatch = true;
+                // Remove interface implementor
                 delete state.extensionContracts[interfaceId];
+                state.implementedInterfaceIds[decrementedIndex] = state.implementedInterfaceIds[numberOfInterfacesImplemented - 1];
+                state.implementedInterfaceIds.pop();
 
-                // Swap interfaceId with final item and pop from array for constant time array removal
-                state.interfaceIds[i] = state.interfaceIds[interfaceIdsLength - 1];
-                state.interfaceIds.pop();
+                // Remove function selector implementor
+                uint256 numberOfFunctionsImplemented = state.implementedFunctionsByInterfaceId[interfaceId].length;
+                for (uint j = 0; j < numberOfFunctionsImplemented; j++) {
+                    bytes4 functionSelector = state.implementedFunctionsByInterfaceId[interfaceId][j];
+                    delete state.extensionContracts[functionSelector];
+                }
+                delete state.implementedFunctionsByInterfaceId[interfaceId];
 
-                return;
+                numberOfInterfacesImplemented--;
+                i--;
             }
         }
 
-        revert("Retract: specified extension is not an extension of this contract, cannot retract");
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return (type(IRetractLogic).interfaceId);
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return "function retract(address extension) external;\n";
+        if (!hasMatch) {
+            revert("Retract: specified extension is not an extension of this contract, cannot retract");
+        }
     }
 }

@@ -5,10 +5,13 @@ pragma solidity ^0.8.4;
  * @dev Storage struct used to hold state for Extendable contracts
  */
 struct ExtendableState {
-    // Array of interfaceIds extended by the Extendable contract instance
-    bytes4[] interfaceIds;
+    // Array of full interfaceIds extended by the Extendable contract instance
+    bytes4[] implementedInterfaceIds;
 
-    // Mapping of interfaceId to the extension address that implements it
+    // Array of function selectors extended by the Extendable contract instance
+    mapping(bytes4 => bytes4[]) implementedFunctionsByInterfaceId;
+
+    // Mapping of interfaceId/functionSelector to the extension address that implements it
     mapping(bytes4 => address) extensionContracts;
 }
 

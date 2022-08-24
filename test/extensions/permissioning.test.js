@@ -1,11 +1,10 @@
-const { BigNumber } = require("ethers");
 const { ethers } = require("hardhat");
-const web3 = require("web3");
 const chai = require("chai");
-const { PERMISSIONING_LOGIC_INTERFACE } = require("../utils/constants")
+const { PERMISSIONING } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
+const { getExtendedContractWithInterface } = require("../utils/utils");
 chai.use(solidity);
-const { expect, assert } = chai;
+const { expect } = chai;
 
 describe("PermissioningLogic", function () {
     let account;
@@ -48,9 +47,7 @@ describe("PermissioningLogic", function () {
     
         it("update owner to original owner should succeed", async function () {
             await logic.updateOwner(account2.address);
-
             await expect(logic.connect(account2).updateOwner(account.address)).to.not.be.reverted;
-
             expect(await logic.callStatic.getOwner()).to.equal(account.address);
         });
     
@@ -63,13 +60,23 @@ describe("PermissioningLogic", function () {
             await expect(logic.renounceOwnership()).to.not.be.reverted;
             expect(await logic.callStatic.getOwner()).to.equal(NULL_ADDRESS);
         });
-    
+
         it("should register interface id during constructor correctly", async function () {
-            expect(await logic.callStatic.supportsInterface(PERMISSIONING_LOGIC_INTERFACE)).to.be.true;
+            const extensionAsEIP165 = await getExtendedContractWithInterface(logic.address, "ERC165Logic");
+            expect(await extensionAsEIP165.callStatic.supportsInterface(PERMISSIONING.INTERFACE)).to.be.true;
         });
-    
-        it("should return interfaceId correctly", async function () {
-            expect(await logic.callStatic.getInterfaceId()).to.equal(PERMISSIONING_LOGIC_INTERFACE);
+
+        it("should return implemented interfaces correctly", async function () {
+            expect(await logic.callStatic.getInterface()).to.deep.equal([[PERMISSIONING.INTERFACE, PERMISSIONING.SELECTORS]]);
+        });
+
+        it("should return solidity interface correctly", async function () {
+            expect(await logic.callStatic.getSolidityInterface()).to.equal("".concat(
+                "function init() external;\n",
+                "function updateOwner(address newOwner) external;\n",
+                "function renounceOwnership() external;\n",
+                "function getOwner() external view returns(address);\n"
+            ));
         });
     });
 

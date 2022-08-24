@@ -31,15 +31,22 @@ contract ExtendCaller {
         Revert.require(success);
     }
 
-    function getCurrentInterface() public returns(string memory) {
-        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getCurrentInterface()"));
+    function getFullInterface() public returns(string memory) {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getFullInterface()"));
         Revert.require(success);
         string memory interfaceString = abi.decode(result, (string));
         return(interfaceString);
     }
 
-    function getExtensions() public returns(bytes4[] memory) {
-        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getExtensions()"));
+    function getExtensionsInterfaceIds() public returns(bytes4[] memory) {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getExtensionsInterfaceIds()"));
+        Revert.require(success);
+        bytes4[] memory extensions = abi.decode(result, (bytes4[]));
+        return(extensions);
+    }
+
+    function getExtensionsFunctionSelectors() public returns(bytes4[] memory) {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getExtensionsFunctionSelectors()"));
         Revert.require(success);
         bytes4[] memory extensions = abi.decode(result, (bytes4[]));
         return(extensions);
