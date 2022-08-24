@@ -11,7 +11,7 @@ interface IMockNewFunction {
 contract MockNewExtendLogic is IMockNewFunction, IExtendLogic, Extension {
     function extend(address extension) override public {}
 
-    function getCurrentInterface() override public pure returns(string memory fullInterface) { return("lel"); }
+    function getFullInterface() override public pure returns(string memory fullInterface) { return("lel"); }
 
     function getExtensionsInterfaceIds() override public pure returns(bytes4[] memory) { return(new bytes4[](0xffffffff)); }
 
@@ -23,7 +23,7 @@ contract MockNewExtendLogic is IMockNewFunction, IExtendLogic, Extension {
 
     function getSolidityInterface() override public pure returns(string memory) {
         return  "function extend(address extension) external;\n"
-                "function getCurrentInterface() external view returns(string memory);\n"
+                "function getFullInterface() external view returns(string memory);\n"
                 "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n"
                 "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n"
                 "function getExtensionAddresses() external view returns(address[] memory);\n"
@@ -35,7 +35,7 @@ contract MockNewExtendLogic is IMockNewFunction, IExtendLogic, Extension {
 
         bytes4[] memory IExtendFunctions = new bytes4[](5);
         IExtendFunctions[0] = IExtendLogic.extend.selector;
-        IExtendFunctions[1] = IExtendLogic.getCurrentInterface.selector;
+        IExtendFunctions[1] = IExtendLogic.getFullInterface.selector;
         IExtendFunctions[2] = IExtendLogic.getExtensionsInterfaceIds.selector;
         IExtendFunctions[3] = IExtendLogic.getExtensionsFunctionSelectors.selector;
         IExtendFunctions[4] = IExtendLogic.getExtensionAddresses.selector;

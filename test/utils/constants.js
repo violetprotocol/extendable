@@ -9,10 +9,10 @@ module.exports = {
         ]
     },
     EXTEND: {
-        INTERFACE: "0x23001c73",
+        INTERFACE: "0xdc8f7254",
         SELECTORS: [
             "0x82005715",
-            "0xa9cf0ea9",
+            "0x5640608e",
             "0x1a946137",
             "0x1f226938",
             "0x0d794dc0"

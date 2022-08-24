@@ -31,8 +31,8 @@ contract ExtendCaller {
         Revert.require(success);
     }
 
-    function getCurrentInterface() public returns(string memory) {
-        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getCurrentInterface()"));
+    function getFullInterface() public returns(string memory) {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("getFullInterface()"));
         Revert.require(success);
         string memory interfaceString = abi.decode(result, (string));
         return(interfaceString);

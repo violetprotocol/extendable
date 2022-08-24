@@ -10,10 +10,10 @@ const shouldInitialiseExtendableCorrectly = async (extendableAddress, extendLogi
     expect(await extendable.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
     expect(await extendable.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
     expect(await extendable.callStatic.getExtensionAddresses()).to.deep.equal([extendLogicAddress]);
-    expect(await extendable.callStatic.getCurrentInterface()).to.equal("".concat(
+    expect(await extendable.callStatic.getFullInterface()).to.equal("".concat(
         "interface IExtended {\n",
         "function extend(address extension) external;\n",
-        "function getCurrentInterface() external view returns(string memory);\n",
+        "function getFullInterface() external view returns(string memory);\n",
         "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
         "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
         "function getExtensionAddresses() external view returns(address[] memory);\n",

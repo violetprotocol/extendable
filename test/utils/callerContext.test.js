@@ -53,10 +53,10 @@ describe("CallerContext", function () {
             expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_CALLER_CONTEXT.INTERFACE]);
             expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_CALLER_CONTEXT.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address]);
-            expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
+            expect(await extendableExtendLogic.callStatic.getFullInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
-                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getFullInterface() external view returns(string memory);\n",
                     "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
                     "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",
@@ -73,10 +73,10 @@ describe("CallerContext", function () {
             expect(await extendableExtendLogic.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_CALLER_CONTEXT.INTERFACE, MOCK_DEEP_CALLER_CONTEXT.INTERFACE]);
             expect(await extendableExtendLogic.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_CALLER_CONTEXT.SELECTORS, ...MOCK_DEEP_CALLER_CONTEXT.SELECTORS]);
             expect(await extendableExtendLogic.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockCallerContext.address, mockDeepCallerContext.address]);
-            expect(await extendableExtendLogic.callStatic.getCurrentInterface()).to.equal("".concat(
+            expect(await extendableExtendLogic.callStatic.getFullInterface()).to.equal("".concat(
                 "interface IExtended {\n",
                     "function extend(address extension) external;\n",
-                    "function getCurrentInterface() external view returns(string memory);\n",
+                    "function getFullInterface() external view returns(string memory);\n",
                     "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
                     "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                     "function getExtensionAddresses() external view returns(address[] memory);\n",

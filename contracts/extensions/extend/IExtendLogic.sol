@@ -31,7 +31,7 @@ interface IExtendLogic {
      * Expects `extension.getSolidityInterface` to return interface-compatible syntax with line-separated
      * function declarations including visibility, mutability and returns.
     */
-    function getCurrentInterface() external view returns(string memory fullInterface);
+    function getFullInterface() external view returns(string memory fullInterface);
 
     /**
      * @dev Returns an array of interfaceIds that are currently implemented by the current
@@ -60,7 +60,7 @@ abstract contract ExtendExtension is IExtendLogic, Extension {
     */
     function getSolidityInterface() override virtual public pure returns(string memory) {
         return  "function extend(address extension) external;\n"
-                "function getCurrentInterface() external view returns(string memory);\n"
+                "function getFullInterface() external view returns(string memory);\n"
                 "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n"
                 "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n"
                 "function getExtensionAddresses() external view returns(address[] memory);\n";
@@ -74,7 +74,7 @@ abstract contract ExtendExtension is IExtendLogic, Extension {
 
         bytes4[] memory functions = new bytes4[](5);
         functions[0] = IExtendLogic.extend.selector;
-        functions[1] = IExtendLogic.getCurrentInterface.selector;
+        functions[1] = IExtendLogic.getFullInterface.selector;
         functions[2] = IExtendLogic.getExtensionsInterfaceIds.selector;
         functions[3] = IExtendLogic.getExtensionsFunctionSelectors.selector;
         functions[4] = IExtendLogic.getExtensionAddresses.selector;

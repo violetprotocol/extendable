@@ -65,9 +65,9 @@ contract ExtendLogic is ExtendExtension {
     }
 
     /**
-     * @dev see {IExtendLogic-getCurrentInterface}
+     * @dev see {IExtendLogic-getFullInterface}
     */
-    function getCurrentInterface() override public view returns(string memory fullInterface) {
+    function getFullInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
 
         uint numberOfInterfacesImplemented = state.implementedInterfaces.length;

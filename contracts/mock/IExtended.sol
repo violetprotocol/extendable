@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 interface IExtended {
     // from ExtendLogic interface
     function extend(address extension) external;
-    function getCurrentInterface() external returns(string memory);
+    function getFullInterface() external returns(string memory);
     function getExtensions() external returns(address[] memory);
 
     // from PermissioningLogic interface

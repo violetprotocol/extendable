@@ -53,7 +53,7 @@ describe("ExtendLogic", function () {
     it("should return solidity interface correctly", async function () {
         expect(await extendLogic.callStatic.getSolidityInterface()).to.equal("".concat(
             "function extend(address extension) external;\n",
-            "function getCurrentInterface() external view returns(string memory);\n",
+            "function getFullInterface() external view returns(string memory);\n",
             "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
             "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
             "function getExtensionAddresses() external view returns(address[] memory);\n",
@@ -65,10 +65,10 @@ describe("ExtendLogic", function () {
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);
-        expect(await caller.callStatic.getCurrentInterface()).to.equal("".concat(
+        expect(await caller.callStatic.getFullInterface()).to.equal("".concat(
             "interface IExtended {\n",
                 "function extend(address extension) external;\n",
-                "function getCurrentInterface() external view returns(string memory);\n",
+                "function getFullInterface() external view returns(string memory);\n",
                 "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
                 "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
                 "function getExtensionAddresses() external view returns(address[] memory);\n",
