@@ -110,8 +110,6 @@ contract Extendable {
      *
      * Initially attempts to locate an interfaceId match with a function selector
      * which are extensions that house single functions (singleton extensions)
-     * If none is found then attempt execution by cycling through extensions and
-     * calling.
      *
      * If no implementations are found that match the requested function signature,
      * returns ExtensionNotImplemented error
