@@ -12,8 +12,7 @@ module.exports = {
         // const Contract = await hre.ethers.getContractFactory("ERC165Logic");
         // const deploymentTx = await Contract.getDeployTransaction();
 
-        const Factory = new hre.ethers.Contract("0x0000000000000000000000000000000000000000", factoryABI, signer);
-        const factory = await Factory.attach(singletonFactoryAddress);
+        const factory = await hre.ethers.getContractAt(factoryABI, singletonFactoryAddress, signer);
 
         const tx = await factory.deploy(erc165Bytecode, erc165DeploymentSalt, { gasLimit: "0x07A120" });
         const receipt = await tx.wait();
