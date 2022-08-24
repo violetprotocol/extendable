@@ -27,6 +27,8 @@ import "../erc165/IERC165Logic.sol";
  *
  */
 abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Register {
+    address constant ERC165LogicAddress = 0x16C940672fA7820C36b2123E657029d982629070;
+
     /**
      * @dev Constructor registers your custom Extension interface under EIP-165:
      *      https://eips.ethereum.org/EIPS/eip-165
@@ -46,9 +48,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function supportsInterface(bytes4 interfaceId) external override virtual returns(bool) {
-        // Static address for the ERC165Logic
-        address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
-        (bool success, bytes memory result) = ERC165Logic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
+        (bool success, bytes memory result) = ERC165LogicAddress.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", interfaceId));
 
         if (!success) {
             assembly {
@@ -60,9 +60,7 @@ abstract contract Extension is CallerContext, IExtension, IERC165, IERC165Regist
     }
 
     function registerInterface(bytes4 interfaceId) public override virtual {
-        // Static address for the ERC165Logic
-        address ERC165Logic = address(0x16C940672fA7820C36b2123E657029d982629070);
-        (bool success, ) = ERC165Logic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
+        (bool success, ) = ERC165LogicAddress.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", interfaceId));
 
         if (!success) {
             assembly {
