@@ -148,10 +148,11 @@ contract ExtendLogic is ExtendExtension {
         uint256 numberOfInterfacesImplemented = interfaces.length;
         for (uint256 i = 0; i < numberOfInterfacesImplemented; i++) {
             bytes4 interfaceId = interfaces[i].interfaceId;
+            address implementer = state.extensionContracts[interfaceId];
 
             require(
-                state.extensionContracts[interfaceId] == address(0x0),
-                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaceId)), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[interfaceId])))
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: interface ", Strings.toHexString(uint256(uint32(interfaceId)), 4)," is already implemented by ", Strings.toHexString(implementer)))
             );
 
             registerFunctions(interfaceId, interfaces[i].functions, extension);
@@ -166,9 +167,11 @@ contract ExtendLogic is ExtendExtension {
         // Record each function as implemented by new extension, revert if a function is already implemented by another extension
         uint256 numberOfFunctions = functionSelectors.length;
         for (uint256 i = 0; i < numberOfFunctions; i++) {
+            address implementer = state.extensionContracts[functionSelectors[i]];
+
             require(
-                state.extensionContracts[functionSelectors[i]] == address(0x0),
-                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functionSelectors[i])), 4)," is already implemented by ", Strings.toHexString(state.extensionContracts[functionSelectors[i]])))
+                implementer == address(0x0),
+                string(abi.encodePacked("Extend: function ", Strings.toHexString(uint256(uint32(functionSelectors[i])), 4)," is already implemented by ", Strings.toHexString(implementer)))
             );
 
             state.extensionContracts[functionSelectors[i]] = extension;
