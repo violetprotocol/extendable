@@ -70,9 +70,9 @@ contract ExtendLogic is ExtendExtension {
     function getFullInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
 
-        uint numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
-            bytes4 interfaceId = state.implementedInterfaces[i];
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
             IExtension logic = IExtension(state.extensionContracts[interfaceId]);
             fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
         }
@@ -86,7 +86,7 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensionsInterfaceIds() override public view returns(bytes4[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        return state.implementedInterfaces;
+        return state.implementedInterfaceIds;
     }
 
     /**
@@ -94,7 +94,7 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensionsFunctionSelectors() override public view returns(bytes4[] memory functionSelectors) {
         ExtendableState storage state = ExtendableStorage._getState();
-        bytes4[] storage implementedInterfaces = state.implementedInterfaces;
+        bytes4[] storage implementedInterfaces = state.implementedInterfaceIds;
         
         uint256 numberOfFunctions = 0;
         for (uint256 i = 0; i < implementedInterfaces.length; i++) {
@@ -117,10 +117,10 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        address[] memory addresses = new address[](state.implementedInterfaces.length);
+        address[] memory addresses = new address[](state.implementedInterfaceIds.length);
         
-        for (uint i = 0; i < state.implementedInterfaces.length; i++) {
-            bytes4 interfaceId = state.implementedInterfaces[i];
+        for (uint i = 0; i < state.implementedInterfaceIds.length; i++) {
+            bytes4 interfaceId = state.implementedInterfaceIds[i];
             addresses[i] = state.extensionContracts[interfaceId];
         }
         return addresses;
@@ -157,7 +157,7 @@ contract ExtendLogic is ExtendExtension {
 
             registerFunctions(interfaceId, interfaces[i].functions, extension);
             state.extensionContracts[interfaceId] = extension;
-            state.implementedInterfaces.push(interfaceId);
+            state.implementedInterfaceIds.push(interfaceId);
         }
     }
 

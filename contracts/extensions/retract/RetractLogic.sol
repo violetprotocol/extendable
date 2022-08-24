@@ -27,14 +27,14 @@ contract RetractLogic is RetractExtension {
         ExtendableState storage state = ExtendableStorage._getState();
 
         // Search for extension in interfaceIds
-        uint256 numberOfInterfacesImplemented = state.implementedInterfaces.length;
+        uint256 numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
         bool hasMatch;
 
         // we start with index 1 and reduce by one due to line 43 shortening the array
         // we need to decrement the counter if we shorten the array, but uint cannot be < 0
         for (uint i = 1; i < numberOfInterfacesImplemented + 1; i++) {
             uint256 decrementedIndex = i - 1;
-            bytes4 interfaceId = state.implementedInterfaces[decrementedIndex];
+            bytes4 interfaceId = state.implementedInterfaceIds[decrementedIndex];
             address currentExtension = state.extensionContracts[interfaceId];
 
             // Check if extension matches the one we are looking for
@@ -42,8 +42,8 @@ contract RetractLogic is RetractExtension {
                 hasMatch = true;
                 // Remove interface implementor
                 delete state.extensionContracts[interfaceId];
-                state.implementedInterfaces[decrementedIndex] = state.implementedInterfaces[numberOfInterfacesImplemented - 1];
-                state.implementedInterfaces.pop();
+                state.implementedInterfaceIds[decrementedIndex] = state.implementedInterfaceIds[numberOfInterfacesImplemented - 1];
+                state.implementedInterfaceIds.pop();
 
                 // Remove function selector implementor
                 uint256 numberOfFunctionsImplemented = state.implementedFunctionsByInterfaceId[interfaceId].length;
