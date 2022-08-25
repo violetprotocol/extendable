@@ -4,6 +4,7 @@ const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = chai;
 const {singletonFactoryDeployer, singletonFactoryDeploymentTx, singletonFactoryAddress, factoryABI, EXTEND, erc165Bytecode, erc165DeploymentSalt} = require("./constants");
+const { utils } = require("ethers");
 
 const shouldInitialiseExtendableCorrectly = async (extendableAddress, extendLogicAddress) => {
     const extendable = await getExtendedContractWithInterface(extendableAddress, "ExtendLogic");

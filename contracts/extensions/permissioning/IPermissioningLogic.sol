@@ -10,7 +10,7 @@ interface IPermissioningLogic {
     /**
      * @dev Emitted when `owner` is updated in any way
      */
-    event OwnerUpdated(address oldOwner, address newOwner);
+    event OwnerUpdated(address newOwner);
 
     /**
      * @dev Initialises the `owner` of the contract as `msg.sender`
