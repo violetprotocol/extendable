@@ -84,5 +84,7 @@ contract ReplaceLogic is ReplaceExtension {
                 }
             }
         }
+
+        emit Replaced(oldExtension, newExtension);
     }
 }

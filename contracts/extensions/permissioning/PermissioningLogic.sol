@@ -36,8 +36,10 @@ contract PermissioningLogic is PermissioningExtension {
     */
     function init() override public {
         RoleState storage state = Permissions._getState();
-        require(state.owner == address(0x0), "already initialised"); // make sure owner has yet to be set for delegator
+        require(state.owner == address(0x0), "PermissioningLogic: already initialised"); // make sure owner has yet to be set for delegator
         state.owner = _lastCaller();
+
+        emit OwnerUpdated(_lastCaller());
     }
 
     /**
@@ -47,6 +49,8 @@ contract PermissioningLogic is PermissioningExtension {
         require(newOwner != address(0x0), "new owner cannot be the zero address");
         RoleState storage state = Permissions._getState();
         state.owner = newOwner;
+
+        emit OwnerUpdated(newOwner);
     }
 
     /**
@@ -56,6 +60,8 @@ contract PermissioningLogic is PermissioningExtension {
         address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
         RoleState storage state = Permissions._getState();
         state.owner = NULL_ADDRESS;
+
+        emit OwnerUpdated(NULL_ADDRESS);
     }
 
     /**

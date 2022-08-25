@@ -37,10 +37,6 @@ describe("ExtendLogic", function () {
         await caller.deployed();
     })
 
-    it("deployment should have initialised owner", async function () {
-        expect(await caller.callStatic.getOwner(permissioningLogic.address)).to.equal(account.address);
-    });
-
     it("should register interface id during constructor correctly", async function () {
         const extensionAsEIP165 = await utils.getExtendedContractWithInterface(extendLogic.address, "ERC165Logic");
         expect(await extensionAsEIP165.callStatic.supportsInterface(EXTEND.INTERFACE)).to.be.true;
@@ -61,7 +57,9 @@ describe("ExtendLogic", function () {
     });
 
     it("extend should succeed", async function () {
-        await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        const tx = await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: extendLogic.address });
+        await utils.expectEvent(tx, extendLogic.interface, "OwnerInitialised", { newOwner: account.address });
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
         expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal(EXTEND.SELECTORS);
         expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address]);

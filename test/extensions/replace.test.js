@@ -63,13 +63,15 @@ describe("ReplaceLogic", function () {
         await caller.deployed();
     })
 
-    it("deployment should have initialised permissioning", async function () {
-        expect(await caller.callStatic.getOwner(permissioningLogic.address)).to.equal(account.address);
+    it("initialise permissioning", async function () {
+        await expect(caller.init()).to.not.be.reverted;
+        expect(await caller.callStatic.getOwner()).to.equal(account.address);
     });
 
     describe("extend with replace", () => {
         it("extend should succeed", async function () {
-            await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(extendLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: extendLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE],
@@ -79,7 +81,8 @@ describe("ReplaceLogic", function () {
         });
     
         it("extend with permissioning should succeed", async function () {
-            await expect(caller.callExtend(permissioningLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(permissioningLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: permissioningLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE, PERMISSIONING.INTERFACE], 
@@ -89,7 +92,8 @@ describe("ReplaceLogic", function () {
         });
     
         it("extend with replace should succeed", async function () {
-            await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+            const tx = await expect(caller.callExtend(replaceLogic.address)).to.not.be.reverted;
+            await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: replaceLogic.address });
             await utils.checkExtensions(
                 caller, 
                 [EXTEND.INTERFACE, PERMISSIONING.INTERFACE, REPLACE.INTERFACE], 
@@ -237,8 +241,9 @@ describe("ReplaceLogic", function () {
 });
 
 const replace = async (caller, oldExtension, newExtension, expectedInterfaceIds, expectedFunctionSelectors, expectedContractAddresses, revertMessage = false) => {
+    let tx;
     if (revertMessage !== false) await expect(caller.callReplace(oldExtension, newExtension)).to.be.revertedWith(revertMessage);
-    else await expect(caller.callReplace(oldExtension, newExtension)).to.not.be.reverted;
+    else tx = await expect(caller.callReplace(oldExtension, newExtension)).to.not.be.reverted;
 
     await utils.checkExtensions(
         caller, 
@@ -246,4 +251,6 @@ const replace = async (caller, oldExtension, newExtension, expectedInterfaceIds,
         expectedFunctionSelectors,
         expectedContractAddresses
     );
+    const contract = await utils.getExtendedContractWithInterface(caller.address, "ReplaceLogic");
+    if (tx) await utils.expectEvent(tx, contract.interface, "Replaced", { oldExtension, newExtension });
 }

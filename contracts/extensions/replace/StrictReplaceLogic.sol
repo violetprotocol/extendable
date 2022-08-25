@@ -82,5 +82,7 @@ contract StrictReplaceLogic is ReplaceExtension {
                 }
             }
         }
+
+        emit Replaced(oldExtension, newExtension);
     }
 }
