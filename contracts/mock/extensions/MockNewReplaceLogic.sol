@@ -11,11 +11,19 @@ interface IMockNewReplaceLogic {
 contract MockNewReplaceLogic is IMockNewReplaceLogic, Extension {
     function replace(address oldExtension, address newExtension) override public {}
     function replaceWith(address oldExtension, address newExtension) override public {}
-    function getInterface() override public pure returns(string memory) {
+    function getSolidityInterface() override public pure returns(string memory) {
         return  "function replace(address oldExtension, address newExtension) external;\n"
                 "function replaceWith(address oldExtension, address newExtension) external;\n";
     }
-    function getInterfaceId() override public pure returns(bytes4) {
-        return type(IMockNewReplaceLogic).interfaceId;
+    function getInterface() override public pure returns(Interface[] memory interfaces) {
+        interfaces = new Interface[](1);
+
+        bytes4[] memory functions = new bytes4[](2);
+        functions[0] = IMockNewReplaceLogic.replace.selector;
+        functions[1] = IMockNewReplaceLogic.replaceWith.selector;
+        interfaces[0] = Interface(
+            type(IMockNewReplaceLogic).interfaceId,
+            functions
+        );
     }
 }

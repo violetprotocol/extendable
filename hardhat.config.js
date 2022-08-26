@@ -23,6 +23,10 @@ module.exports = {
       url: `${process.env.RINKEBY_NODE_URL}`,
       accounts: [`0x${process.env.PRIVATE_KEY}`],
     },
+    kovan: {
+      url: `${process.env.KOVAN_NODE_URL}`,
+      accounts: [`0x${process.env.PRIVATE_KEY}`],
+    }
   },
   tenderly: {
     username: `${process.env.TENDERLY_USERNAME}`,

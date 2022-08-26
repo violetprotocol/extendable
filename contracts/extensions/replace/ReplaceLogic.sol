@@ -12,7 +12,7 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
  * @dev Reference implementation for ReplaceLogic which defines a basic extension
  *      replacement algorithm.
 */
-contract ReplaceLogic is IReplaceLogic, Extension {
+contract ReplaceLogic is ReplaceExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
@@ -21,7 +21,7 @@ contract ReplaceLogic is IReplaceLogic, Extension {
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
     modifier onlyOwner {
-        address owner = Permissions._getStorage().owner;
+        address owner = Permissions._getState().owner;
         require(_lastCaller() == owner, "unauthorised");
         _;
     }
@@ -54,8 +54,25 @@ contract ReplaceLogic is IReplaceLogic, Extension {
                 IExtension old = IExtension(payable(oldExtension));
                 IExtension newEx = IExtension(payable(newExtension));
 
-                // upgrade this contract with modified equality below to enforce a specific new ExtendLogic interface
-                require(newEx.getInterfaceId() == old.getInterfaceId(), "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces");
+                Interface[] memory oldInterfaces = old.getInterface();
+                Interface[] memory newInterfaces = newEx.getInterface();
+
+                // require the interfaceIds implemented by the old extension is equal to the new one
+                bytes4 oldFullInterface = oldInterfaces[0].interfaceId;
+                bytes4 newFullInterface = newInterfaces[0].interfaceId;
+
+                for (uint256 i = 1; i < oldInterfaces.length; i++) {
+                    oldFullInterface = oldFullInterface ^ oldInterfaces[i].interfaceId;
+                }
+
+                for (uint256 i = 1; i < newInterfaces.length; i++) {
+                    newFullInterface = newFullInterface ^ newInterfaces[i].interfaceId;
+                }
+                
+                require(
+                    newFullInterface == oldFullInterface, 
+                    "Replace: ExtendLogic interface of new does not match old, please only use identical ExtendLogic interfaces"
+                );
                 
                 // use raw delegate call to re-extend the extension because we have just removed the Extend function
                 (bool extendSuccess, ) = newExtension.delegatecall(abi.encodeWithSignature("extend(address)", newExtension));
@@ -67,19 +84,7 @@ contract ReplaceLogic is IReplaceLogic, Extension {
                 }
             }
         }
-    }
 
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return (type(IReplaceLogic).interfaceId);
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return "function replace(address oldExtension, address newExtension) external;\n";
+        emit Replaced(oldExtension, newExtension);
     }
 }

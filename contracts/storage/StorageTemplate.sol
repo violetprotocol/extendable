@@ -23,7 +23,7 @@ library StorageTemplate {
     // collisions with other potential storage libraries used by the same delegator
     bytes32 constant private STORAGE_NAME = keccak256("your_unique_storage_identifier");
 
-    function _getStorage()
+    function _getState()
         internal 
         view
         returns (YourStruct storage state) 

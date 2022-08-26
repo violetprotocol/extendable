@@ -17,17 +17,16 @@ import {RoleState, Permissions} from "../../storage/PermissionStorage.sol";
  * to only `owner`. Uses a common function from the storage library `_onlyOwner()` as a
  * modifier replacement. Can be wrapped in a modifier if preferred.
 */
-contract PermissioningLogic is IPermissioningLogic, Extension {
+contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {Extension-constructor} for constructor
     */
-
 
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
     modifier onlyOwner {
-        address owner = Permissions._getStorage().owner;
+        address owner = Permissions._getState().owner;
         require(_lastCaller() == owner, "unauthorised");
         _;
     }
@@ -36,40 +35,40 @@ contract PermissioningLogic is IPermissioningLogic, Extension {
      * @dev see {IPermissioningLogic-init}
     */
     function init() override public {
-        RoleState storage state = Permissions._getStorage();
-        require(state.owner == address(0x0), "already initialised"); // make sure owner has yet to be set for delegator
+        RoleState storage state = Permissions._getState();
+        require(state.owner == address(0x0), "PermissioningLogic: already initialised"); // make sure owner has yet to be set for delegator
         state.owner = _lastCaller();
+
+        emit OwnerUpdated(_lastCaller());
     }
 
     /**
      * @dev see {IPermissioningLogic-updateOwner}
     */
     function updateOwner(address newOwner) override public onlyOwner {
-        RoleState storage state = Permissions._getStorage();
+        require(newOwner != address(0x0), "new owner cannot be the zero address");
+        RoleState storage state = Permissions._getState();
         state.owner = newOwner;
+
+        emit OwnerUpdated(newOwner);
+    }
+
+    /**
+     * @dev see {IPermissioningLogic-renounceOwnership}
+    */
+    function renounceOwnership() override public onlyOwner {
+        address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
+        RoleState storage state = Permissions._getState();
+        state.owner = NULL_ADDRESS;
+
+        emit OwnerUpdated(NULL_ADDRESS);
     }
 
     /**
      * @dev see {IPermissioningLogic-getOwner}
     */
     function getOwner() override public view returns(address) {
-        RoleState storage state = Permissions._getStorage();
+        RoleState storage state = Permissions._getState();
         return(state.owner);
-    }
-
-    /**
-     * @dev see {IExtension-getInterfaceId}
-    */
-    function getInterfaceId() override public pure returns(bytes4) {
-        return(type(IPermissioningLogic).interfaceId);
-    }
-
-    /**
-     * @dev see {IExtension-getInterface}
-    */
-    function getInterface() override public pure returns(string memory) {
-        return  "function init() external;\n"
-                "function updateOwner(address newOwner) external;\n"
-                "function getOwner() external view returns(address);\n";
     }
 }

@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 /**
  * Helper library for require statements for low level calls
  *
- * Checks a boolean and throws the latest returndata if false
+ * Checks a boolean result and throws the latest returndata if false
  */
 library Revert {
     function require(bool expected) internal pure {

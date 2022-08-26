@@ -4,8 +4,6 @@ pragma solidity ^0.8.4;
 import "../errors/Errors.sol";
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
-import {RoleState, Permissions} from "../storage/PermissionStorage.sol";
-import "../extensions/permissioning/PermissioningLogic.sol";
 import "../extensions/extend/ExtendLogic.sol";
 
 /**
@@ -74,8 +72,12 @@ contract Extendable {
      * logic and returns as such.
      */
     function _delegate(address delegatee) internal virtual returns(bool) {
+        _beforeFallback();
+        
         bytes memory out;
         (bool success, bytes memory result) = delegatee.delegatecall(msg.data);
+
+        _afterFallback();
 
         // copy all returndata to `out` once instead of duplicating copy for each conditional branch
         assembly {
@@ -96,9 +98,6 @@ contract Extendable {
             }
         } else {
             // otherwise end execution and return the copied full returndata
-
-            // make sure to call _afterFallback before ending execution
-            _afterFallback();
             assembly {
                 return(out, returndatasize())
             }
@@ -111,32 +110,20 @@ contract Extendable {
      *
      * Initially attempts to locate an interfaceId match with a function selector
      * which are extensions that house single functions (singleton extensions)
-     * If none is found then attempt execution by cycling through extensions and
-     * calling.
      *
      * If no implementations are found that match the requested function signature,
      * returns ExtensionNotImplemented error
      */
     function _fallback() internal virtual {
-        _beforeFallback();
-        ExtendableState storage state = ExtendableStorage._getStorage();
+        ExtendableState storage state = ExtendableStorage._getState();
 
-        bool ok = false;
         // if an extension exists that matches in the functionsig
         if (state.extensionContracts[msg.sig] != address(0x0)) {
             // call it
             _delegate(state.extensionContracts[msg.sig]);
         } else {                                                 
-            // else cycle through all extensions to find it if exists
-            // this is not the preferred method for usage and only acts as a fallback
-            for (uint i = 0; i < state.interfaceIds.length; i++) {
-                ok = _delegate(state.extensionContracts[state.interfaceIds[i]]);
-                if (ok) break; // exit after first successful execution
-            }
+            revert ExtensionNotImplemented();
         }
-
-        if (!ok) revert ExtensionNotImplemented(); // if there are no successful delegatecalls we assume no implementation.
-        _afterFallback();
     }
 
     /**
@@ -163,7 +150,7 @@ contract Extendable {
      * @dev Virtual hook that is called before _fallback().
      */
     function _beforeFallback() internal virtual {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         state.callerStack.push(msg.sender);
     }
     
@@ -171,7 +158,7 @@ contract Extendable {
      * @dev Virtual hook that is called after _fallback().
      */
     function _afterFallback() internal virtual {
-        CallerState storage state = CallerContextStorage._getStorage();
+        CallerState storage state = CallerContextStorage._getState();
         state.callerStack.pop();
     }
 }

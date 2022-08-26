@@ -1,6 +1,6 @@
 {
   "name": "extendable",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Extendable smart contract pattern",
   "files": [
     "/contracts/**/*.sol",
@@ -18,7 +18,8 @@
     "compile": "hardhat compile",
     "clean": "hardhat clean && rimraf build contracts/build",
     "prepare": "yarn clean && env COMPILE_MODE=production yarn compile",
-    "prepack": "scripts/prepack.sh"
+    "prepack": "scripts/prepack.sh",
+    "remixd": "remixd"
   },
   "repository": {
     "type": "git",
@@ -41,10 +42,12 @@
   },
   "homepage": "https://github.com/violetprotocol/extendable#readme",
   "devDependencies": {
+    "@ethersproject/keccak256": "^5.6.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@nomiclabs/hardhat-web3": "^2.0.0",
     "@tenderly/hardhat-tenderly": "^1.0.13",
+    "@types/bn.js": "^5.1.0",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
     "ethereum-waffle": "^3.4.0",
@@ -54,12 +57,13 @@
     "prettier": "^2.5.1",
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "rimraf": "^3.0.2",
+    "rlp": "^3.0.0",
     "solhint": "^3.3.6",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.7.17",
-    "web3": "^1.5.2"
+    "web3": "^1.7.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.3.0"
+    "@openzeppelin/contracts": "^4.7.0"
   }
 }
