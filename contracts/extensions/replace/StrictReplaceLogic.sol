@@ -19,7 +19,7 @@ contract StrictReplaceLogic is ReplaceExtension {
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
-    modifier onlyOwner {
+    modifier onlyOwner virtual {
         address owner = Permissions._getState().owner;
         require(_lastCaller() == owner, "unauthorised");
         _;

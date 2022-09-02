@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "../errors/Errors.sol";
 import {CallerState, CallerContextStorage} from "../storage/CallerContextStorage.sol";
 import {ExtendableState, ExtendableStorage} from "../storage/ExtendableStorage.sol";
-import "../extensions/extend/ExtendLogic.sol";
 
 /**
  *  ______  __  __  ______  ______  __   __  _____   ______  ______  __      ______    
