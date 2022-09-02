@@ -14,7 +14,7 @@ contract RetractLogic is RetractExtension {
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
-    modifier onlyOwnerOrSelf {
+    modifier onlyOwnerOrSelf virtual {
         address owner = Permissions._getState().owner;
         require(_lastCaller() == owner || _lastCaller() == address(this), "unauthorised");
         _;

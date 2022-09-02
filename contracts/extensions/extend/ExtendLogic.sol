@@ -27,7 +27,7 @@ contract ExtendLogic is ExtendExtension {
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner` or the current contract
     */
-    modifier onlyOwnerOrSelf {
+    modifier onlyOwnerOrSelf virtual {
         initialise();
     
         address owner = Permissions._getState().owner;
