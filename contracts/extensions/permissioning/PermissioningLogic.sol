@@ -25,7 +25,7 @@ contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev modifier that restricts caller of a function to only the most recent caller if they are `owner`
     */
-    modifier onlyOwner {
+    modifier onlyOwner virtual {
         address owner = Permissions._getState().owner;
         require(_lastCaller() == owner, "unauthorised");
         _;
@@ -34,7 +34,7 @@ contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {IPermissioningLogic-init}
     */
-    function init() override public {
+    function init() override public virtual {
         RoleState storage state = Permissions._getState();
         require(state.owner == address(0x0), "PermissioningLogic: already initialised"); // make sure owner has yet to be set for delegator
         state.owner = _lastCaller();
@@ -45,7 +45,7 @@ contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {IPermissioningLogic-updateOwner}
     */
-    function updateOwner(address newOwner) override public onlyOwner {
+    function updateOwner(address newOwner) override public onlyOwner virtual {
         require(newOwner != address(0x0), "new owner cannot be the zero address");
         RoleState storage state = Permissions._getState();
         state.owner = newOwner;
@@ -56,7 +56,7 @@ contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {IPermissioningLogic-renounceOwnership}
     */
-    function renounceOwnership() override public onlyOwner {
+    function renounceOwnership() override public onlyOwner virtual {
         address NULL_ADDRESS = 0x000000000000000000000000000000000000dEaD;
         RoleState storage state = Permissions._getState();
         state.owner = NULL_ADDRESS;
@@ -67,7 +67,7 @@ contract PermissioningLogic is PermissioningExtension {
     /**
      * @dev see {IPermissioningLogic-getOwner}
     */
-    function getOwner() override public view returns(address) {
+    function getOwner() override public virtual view returns(address) {
         RoleState storage state = Permissions._getState();
         return(state.owner);
     }
