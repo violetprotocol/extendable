@@ -1,7 +1,7 @@
 const { ethers } = require("hardhat");
 const chai = require("chai");
 const utils = require("../utils/utils")
-const { EXTEND } = require("../utils/constants")
+const { EXTEND, MOCK_SECOND_EXTENSION, MOCK_EXTENSION } = require("../utils/constants")
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = chai;
@@ -13,6 +13,7 @@ describe("ExtendLogic", function () {
     let mockExtend;
     let caller;
     let mockAlternative;
+    let mockExtension;
 
     before("deploy new", async function () {
         [account, account2] = await ethers.getSigners();
@@ -22,16 +23,19 @@ describe("ExtendLogic", function () {
         const MockExtendLogic = await ethers.getContractFactory("MockNewExtendLogic");
         const ExtendCaller = await ethers.getContractFactory("ExtendCaller");
         const MockAlternative = await ethers.getContractFactory("MockAlternative");
+        const MockSecondExtension = await ethers.getContractFactory("MockSecondExtension");
 
         permissioningLogic = await PermissioningLogic.deploy();
         extendLogic = await ExtendLogic.deploy();
         mockExtend = await MockExtendLogic.deploy();
         mockAlternative = await MockAlternative.deploy();
+        mockExtension = await MockSecondExtension.deploy();
 
         await permissioningLogic.deployed();
         await extendLogic.deployed();
         await mockExtend.deployed();
         await mockAlternative.deployed();
+        await mockExtension.deployed();
 
         caller = await ExtendCaller.deploy(permissioningLogic.address, extendLogic.address);
         await caller.deployed();
@@ -102,5 +106,25 @@ describe("ExtendLogic", function () {
 
     it("extend should fail with already extended function", async function () {
         await expect(caller.callExtend(mockAlternative.address)).to.be.revertedWith(`Extend: function ${EXTEND.SELECTORS[0]} is already implemented by ${extendLogic.address.toLowerCase()}`);
+    });
+
+    it("extend with mock extension should succeed", async function () {
+        const tx = await expect(caller.callExtend(mockExtension.address)).to.not.be.reverted;
+        await utils.expectEvent(tx, extendLogic.interface, "Extended", { extension: mockExtension.address });
+        expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE, MOCK_EXTENSION.INTERFACE, MOCK_SECOND_EXTENSION.INTERFACE]);
+        expect(await caller.callStatic.getExtensionsFunctionSelectors()).to.deep.equal([...EXTEND.SELECTORS, ...MOCK_EXTENSION.SELECTORS, ...MOCK_SECOND_EXTENSION.SELECTORS]);
+        expect(await caller.callStatic.getExtensionAddresses()).to.deep.equal([extendLogic.address, mockExtension.address]);
+        expect(await caller.callStatic.getFullInterface()).to.equal("".concat(
+            "interface IExtended {\n",
+                "function extend(address extension) external;\n",
+                "function getFullInterface() external view returns(string memory);\n",
+                "function getExtensionsInterfaceIds() external view returns(bytes4[] memory);\n",
+                "function getExtensionsFunctionSelectors() external view returns(bytes4[] memory);\n",
+                "function getExtensionAddresses() external view returns(address[] memory);\n",
+                "function test() external;\n",
+                "function reverts() external;\n",
+                "function second() external;\n",
+            "}"
+        ));
     });
 });

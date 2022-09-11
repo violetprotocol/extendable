@@ -72,12 +72,21 @@ contract ExtendLogic is ExtendExtension {
     */
     function getFullInterface() override public view returns(string memory fullInterface) {
         ExtendableState storage state = ExtendableStorage._getState();
-
         uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+
+        // collect all extension addresses
+        address[] memory extensions = new address[](numberOfInterfacesImplemented);
+        uint numberOfUniqueExtensions;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
             bytes4 interfaceId = state.implementedInterfaceIds[i];
-            IExtension logic = IExtension(state.extensionContracts[interfaceId]);
+            extensions[i] = state.extensionContracts[interfaceId];
+
+            // if we have seen this extension before, ignore and continue looping
+            if (i != 0 && exists(extensions[i], extensions, numberOfUniqueExtensions)) continue;
+            
+            IExtension logic = IExtension(extensions[i]);
             fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
+            numberOfUniqueExtensions++;
         }
 
         // TO-DO optimise this return to a standardised format with comments for developers
@@ -120,13 +129,37 @@ contract ExtendLogic is ExtendExtension {
     */
     function getExtensionAddresses() override public view returns(address[] memory) {
         ExtendableState storage state = ExtendableStorage._getState();
-        address[] memory addresses = new address[](state.implementedInterfaceIds.length);
-        
-        for (uint i = 0; i < state.implementedInterfaceIds.length; i++) {
+        uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
+
+        // collect all extension addresses
+        address[] memory extensions = new address[](numberOfInterfacesImplemented);
+        uint numberOfUniqueExtensions;
+        for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
             bytes4 interfaceId = state.implementedInterfaceIds[i];
-            addresses[i] = state.extensionContracts[interfaceId];
+            extensions[i] = state.extensionContracts[interfaceId];
+
+            if (i != 0 && exists(extensions[i], extensions, numberOfUniqueExtensions)) continue;
+            extensions[numberOfUniqueExtensions] = extensions[i];
+            numberOfUniqueExtensions++;
         }
-        return addresses;
+
+        address[] memory uniqueExtensions = new address[](numberOfUniqueExtensions);
+        // retrieve solidity interfaces of unique extensions
+        for (uint i = 0; i < numberOfUniqueExtensions; i++) {
+            uniqueExtensions[i] = extensions[i];
+        }
+
+        return uniqueExtensions;
+    }
+
+    function exists(address item, address[] memory addresses, uint256 untilIndex) internal pure returns(bool) {
+        for (uint i = 0; i < untilIndex; i++) {
+            if (addresses[i] == item) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -162,6 +195,11 @@ contract ExtendLogic is ExtendExtension {
             registerFunctions(interfaceId, interfaces[i].functions, extension);
             state.extensionContracts[interfaceId] = extension;
             state.implementedInterfaceIds.push(interfaceId);
+
+            if (interfaceId == type(IExtendLogic).interfaceId) {
+                state.extensionContracts[type(IERC165).interfaceId] = extension;
+                state.extensionContracts[type(IERC165Register).interfaceId] = extension;
+            }
         }
     }
 
