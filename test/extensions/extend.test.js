@@ -78,6 +78,11 @@ describe("ExtendLogic", function () {
         ));
     });
 
+    it("register interface should successfully register and return supports interface", async function () {
+        await expect(caller.registerInterface("0x80ac58cd")).to.not.be.reverted;
+        expect(await caller.callStatic.supportsInterface("0x80ac58cd")).to.be.true;
+    });
+
     it("extend should fail with non-contract address", async function () {
         await expect(caller.callExtend(account.address)).to.be.revertedWith("Extend: address is not a contract");
         expect(await caller.callStatic.getExtensionsInterfaceIds()).to.deep.equal([EXTEND.INTERFACE]);
