@@ -74,7 +74,7 @@ contract ExtendLogic is ExtendExtension {
         ExtendableState storage state = ExtendableStorage._getState();
         uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
 
-        // collect all extension addresses
+        // collect unique extension addresses
         address[] memory extensions = new address[](numberOfInterfacesImplemented);
         uint numberOfUniqueExtensions;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
@@ -132,7 +132,7 @@ contract ExtendLogic is ExtendExtension {
         ExtendableState storage state = ExtendableStorage._getState();
         uint numberOfInterfacesImplemented = state.implementedInterfaceIds.length;
 
-        // collect all extension addresses
+        // collect unique extension addresses
         address[] memory extensions = new address[](numberOfInterfacesImplemented);
         uint numberOfUniqueExtensions;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
@@ -145,7 +145,6 @@ contract ExtendLogic is ExtendExtension {
         }
 
         address[] memory uniqueExtensions = new address[](numberOfUniqueExtensions);
-        // retrieve solidity interfaces of unique extensions
         for (uint i = 0; i < numberOfUniqueExtensions; i++) {
             uniqueExtensions[i] = extensions[i];
         }
