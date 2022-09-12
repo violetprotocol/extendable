@@ -8,6 +8,12 @@ module.exports = {
             "0x3bccbbc9"
         ]
     },
+    MOCK_SECOND_EXTENSION: {
+        INTERFACE: "0x5a8ac02d",
+        SELECTORS: [
+            "0x5a8ac02d"
+        ]
+    },
     EXTEND: {
         INTERFACE: "0xdc8f7254",
         SELECTORS: [
