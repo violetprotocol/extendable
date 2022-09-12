@@ -49,4 +49,16 @@ contract ExtendCaller is PermissioningCaller {
         address[] memory extensions = abi.decode(result, (address[]));
         return(extensions);
     }
+
+    function registerInterface(bytes4 iface) public {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("registerInterface(bytes4)", iface));
+        Revert.require(success);
+    }
+
+    function supportsInterface(bytes4 iface) public returns(bool) {
+        (bool success, bytes memory result) = _extendLogic.delegatecall(abi.encodeWithSignature("supportsInterface(bytes4)", iface));
+        Revert.require(success);
+        bool supported = abi.decode(result, (bool));
+        return(supported);
+    }
 }

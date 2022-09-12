@@ -129,6 +129,12 @@ describe("Extendable", function () {
                 "}"
             ));
         });
+
+        it("register interface should successfully register and return supports interface", async function () {
+            const extendableAsExtension = await utils.getExtendedContractWithInterface(extendableAddress, "ERC165Logic");
+            await expect(extendableAsExtension.registerInterface("0x80ac58cd")).to.not.be.reverted;
+            expect(await extendableAsExtension.callStatic.supportsInterface("0x80ac58cd")).to.be.true;
+        });
     })
 
     describe("retract", () => {
