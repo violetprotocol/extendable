@@ -79,14 +79,15 @@ contract ExtendLogic is ExtendExtension {
         uint numberOfUniqueExtensions;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
             bytes4 interfaceId = state.implementedInterfaceIds[i];
-            extensions[i] = state.extensionContracts[interfaceId];
+            address extension = state.extensionContracts[interfaceId];
 
             // if we have seen this extension before, ignore and continue looping
-            if (i != 0 && exists(extensions[i], extensions, numberOfUniqueExtensions)) continue;
-            
-            IExtension logic = IExtension(extensions[i]);
-            fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
+            if (i != 0 && exists(extension, extensions, numberOfUniqueExtensions)) continue;
+            extensions[numberOfUniqueExtensions] = extension;
             numberOfUniqueExtensions++;
+            
+            IExtension logic = IExtension(extension);
+            fullInterface = string(abi.encodePacked(fullInterface, logic.getSolidityInterface()));
         }
 
         // TO-DO optimise this return to a standardised format with comments for developers
@@ -136,10 +137,10 @@ contract ExtendLogic is ExtendExtension {
         uint numberOfUniqueExtensions;
         for (uint i = 0; i < numberOfInterfacesImplemented; i++) {
             bytes4 interfaceId = state.implementedInterfaceIds[i];
-            extensions[i] = state.extensionContracts[interfaceId];
+            address extension = state.extensionContracts[interfaceId];
 
-            if (i != 0 && exists(extensions[i], extensions, numberOfUniqueExtensions)) continue;
-            extensions[numberOfUniqueExtensions] = extensions[i];
+            if (i != 0 && exists(extension, extensions, numberOfUniqueExtensions)) continue;
+            extensions[numberOfUniqueExtensions] = extension;
             numberOfUniqueExtensions++;
         }
 
