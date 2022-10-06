@@ -1,7 +1,7 @@
 {
   "name": "@violetprotocol/extendable",
   "description": "Extendable smart contract pattern for Solidity",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "files": [
     "**/*.sol",
     "/build/contracts/*.json",
